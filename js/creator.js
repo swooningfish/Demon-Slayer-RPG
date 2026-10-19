@@ -26,10 +26,29 @@ const GROUPS = {
     ['Shoes', 'shoes', D.SHOES], ['Haori (jacket)', 'haori', D.HAORI], ['Haori colour', 'haoriColor', D.CLOTH_COLORS],
     ['Haori pattern colour', 'haoriColor2', D.CLOTH_COLORS], ['Trousers colour', 'pantsColor', D.CLOTH_COLORS, { none: 'Auto' }],
     ['Leg wrap colour', 'wrapColor', D.CLOTH_COLORS], ['Scarf', 'scarf', D.SCARF], ['Scarf colour', 'scarfColor', D.CLOTH_COLORS],
-    ['Straw cape', 'cape', D.CAPE], ['Arm bands', 'armbands', D.ARMBANDS], ['Fur shorts (Muscle Mouse)', 'shortsColor', D.CLOTH_COLORS]],
+    ['Scarf pattern', 'scarfPattern', D.SCARF_PATTERN], ['Straw cape', 'cape', D.CAPE], ['Arm bands', 'armbands', D.ARMBANDS], ['Shoulder buddy', 'pet', D.PETS], ['Fur shorts (Muscle Mouse)', 'shortsColor', D.CLOTH_COLORS]],
 };
 
 const isColorList = (opts) => typeof opts[0] === 'string';
+
+// Which look options actually change each character type. Everything else is hidden.
+const HUMAN_ONLY = ['face', 'ears', 'nose', 'mouth', 'blush', 'eyeColor2', 'brows', 'hair', 'hairColor', 'hairTip', 'hairFade', 'accessory', 'accColor',
+  'scar', 'mark', 'earrings', 'earringColor', 'headgear', 'headgearColor'];
+const SPECIES_KEYS = {
+  mouse: new Set(['species', 'furColor', 'eyes', 'eyeColor', 'accColor', 'shortsColor']),
+};
+const SPECIES_EYES = ['round', 'gentle', 'fierce', 'sleepy', 'happy', 'wide'];
+function applies(key, species) {
+  if (key === 'furColor') return species !== 'human';
+  if (key === 'shortsColor') return species === 'mouse';
+  if (species === 'mouse') return SPECIES_KEYS.mouse.has(key);
+  if (species === 'boar') return !HUMAN_ONLY.includes(key) || key === 'hairColor';
+  return true;
+}
+const SPECIES_NOTE = {
+  mouse: 'The Muscle Mouse has its own built-in face and body. You can change its fur, eyes, headband gem colour and fur shorts.',
+  boar: 'The Boar Mask covers the whole head. Choose its fur and eye colour here; body and outfit options still work.',
+};
 const pickR = (a) => a[Math.floor(Math.random() * a.length)];
 
 export function randomName(look) {
@@ -158,8 +177,17 @@ export function creatorScreen(root, params) {
     if (tab === 'weapon') panel.innerHTML = weaponPanel();
     else if (tab === 'library') panel.innerHTML = libraryPanel();
     else if (tab === 'name') panel.innerHTML = namePanel();
-    else panel.innerHTML = GROUPS[tab].map(([title, key, opts, extra]) => `<section class="group"><h3>${title}</h3>${chips(key, opts, extra)}</section>`).join('')
+    else {
+      const sp = look.species || 'human';
+      const groups = GROUPS[tab].filter(([, key]) => applies(key, sp)).map(([title, key, opts, extra]) => {
+        const shown = key === 'eyes' && sp !== 'human' ? opts.filter((o) => SPECIES_EYES.includes(o.id)) : opts;
+        const label = key === 'accColor' && sp === 'mouse' ? 'Headband gem colour' : title;
+        return `<section class="group"><h3>${label}</h3>${chips(key, shown, extra)}</section>`;
+      }).join('');
+      const note = sp !== 'human' && GROUPS[tab].some(([, key]) => !applies(key, sp)) ? `<p class="hint species-note">${SPECIES_NOTE[sp]}</p>` : '';
+      panel.innerHTML = note + (groups || '<p class="hint">Nothing to change here for this character.</p>')
       + `<div class="panel-next"><button class="btn" data-act="next">Next: ${TABS[TABS.findIndex((t) => t.id === tab) + 1].label} ▸</button></div>`;
+    }
     panel.scrollTop = top;
   }
 
@@ -180,8 +208,7 @@ export function creatorScreen(root, params) {
       look[t.dataset.k] = v;
       // Picking a mouse or boar sets up a fitting outfit (still changeable).
       if (t.dataset.k === 'species' && v === 'mouse') Object.assign(look, { accColor: '#d8a6e8', furColor: '#c9c4d6' });
-      if (t.dataset.k === 'species' && v === 'boar') Object.assign(look, { uniform: 'bare', haori: 'none', pants: 'baggy', pantsColor: '#26304a', shoes: 'furBoots', furColor: '#9a948e' });
-      if (t.dataset.k === 'species' && v === 'smith') Object.assign(look, { uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'none', pants: 'hakama', pantsColor: '#b8ac90', shoes: 'geta', hairColor: '#1b1416' });
+      if (t.dataset.k === 'species' && v === 'boar') Object.assign(look, { eyeColor: '#3462cc', uniform: 'bare', haori: 'none', pants: 'baggy', pantsColor: '#26304a', shoes: 'furBoots', furColor: '#9a948e' });
       if (t.dataset.k === 'species' && v === 'human' && look.uniform === 'bare') Object.assign(look, { uniform: 'corps' });
       redraw();
       return;

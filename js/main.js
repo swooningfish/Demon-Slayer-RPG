@@ -18,10 +18,8 @@ function titleScreen(root) {
   const when = (t) => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   root.innerHTML = `
     <div class="title-screen">
-      <div class="logo"><span class="logo-kanji" aria-hidden="true">鬼</span><h1>Onigari</h1>
-        <p class="logo-jp">鬼狩り <button class="say-btn" data-act="say" aria-label="Hear how to say Onigari">🔊</button></p>
-        <p class="logo-say">Say it: <b>oh-nee-GAH-ree</b> · means <b>"Demon Hunter"</b></p>
-        <p class="logo-sub">Blade of Dawn</p><p>Create your hunter. Train. Rise to Hashira.</p></div>
+      <div class="logo"><span class="logo-kanji" aria-hidden="true">滅</span><h1>Demon Slayer RPG</h1>
+        <p class="logo-sub">A fan-made adventure</p><p>Create your slayer. Train. Rise to Hashira.</p></div>
       ${storageOk ? '' : '<p class="warn">Saving is blocked in this browser (private mode?). Progress will be lost when you close the page.</p>'}
       <div class="slots">${slots.map((s, i) => s ? `
         <div class="slot">
@@ -35,7 +33,7 @@ function titleScreen(root) {
         ${isIos && !isStandalone ? '<button class="btn" data-act="ios">📲 Install on iPhone / iPad</button>' : ''}
         <label class="btn file-btn">📂 Import a backup<input type="file" accept="application/json,.json" hidden></label>
       </div>
-      <p class="foot">A fan-made game. Your slayers are saved on this device only. Use <b>⋯ → Back up</b> to keep a copy.</p>
+      <p class="foot">Unofficial fan-made game, not affiliated with or endorsed by the creators of <i>Demon Slayer: Kimetsu no Yaiba</i>. Your slayers are saved on this device only. Use <b>⋯ → Back up</b> to keep a copy.</p>
     </div>`;
 
   root.addEventListener('click', async (e) => {
@@ -61,15 +59,6 @@ function titleScreen(root) {
           actions: [{ label: 'Keep', value: false, primary: true }, { label: 'Delete', value: true, danger: true }] });
         if (sure) { deleteSlot(i); go('title'); }
       }
-      return;
-    }
-    if (t.dataset.act === 'say') {
-      // Speak the name in Japanese if the device has a voice for it.
-      try {
-        const u = new SpeechSynthesisUtterance('おにがり');
-        u.lang = 'ja-JP'; u.rate = 0.8;
-        speechSynthesis.cancel(); speechSynthesis.speak(u);
-      } catch { toast('Say it: oh-nee-GAH-ree'); }
       return;
     }
     if (t.dataset.act === 'install' && installEvent) {

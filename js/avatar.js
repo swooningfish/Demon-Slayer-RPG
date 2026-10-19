@@ -238,6 +238,12 @@ function headgear(kind, color) {
   const dk = shade(color, -0.35);
   switch (kind) {
     case 'kasa': return accessory('strawHat');
+    case 'knifeBand': {
+      const knife = (x) => `<path d="M${x - 4},72 L${x - 4},26 Q${x},14 ${x + 4},26 L${x + 4},72Z" fill="#dfe4ec" class="ol" stroke-width="1.6"/><path d="M${x + 1},26 L${x + 1},70" stroke="#fff" stroke-width="1.2"/>`;
+      let dots = '';
+      for (let x = 72; x <= 168; x += 11) dots += `<circle cx="${x}" cy="${78 - Math.sin(((x - 66) / 108) * Math.PI) * 8}" r="2.6" fill="${INK}"/>`;
+      return `${knife(104)}${knife(136)}<path d="M64,76 Q120,58 176,76 L176,90 Q120,72 64,90Z" fill="#f7f4ee" class="ol" stroke-width="1.8"/>${dots}`;
+    }
     case 'hachimaki': return `<path d="M66,74 Q120,58 174,74 L174,88 Q120,72 66,88Z" fill="${color}" class="ol" stroke-width="1.8"/>
       <path d="M174,80 Q196,86 206,100 L196,104 Q190,94 176,88Z M174,84 Q190,100 190,118 L180,116 Q180,100 172,90Z" fill="${color}" class="ol" stroke-width="1.6"/><circle cx="176" cy="82" r="5" fill="${dk}" class="ol" stroke-width="1.4"/>`;
     case 'jingasa': return `<path d="M96,70 L94,146 M144,70 L146,146" stroke="#c8a868" stroke-width="1.6"/>
@@ -262,6 +268,29 @@ function accessory(style, color) {
     case 'flowerMask': return sideMask('flower');
     case 'scarMask': return `<path d="M70,74 Q120,58 170,74" fill="none" stroke="#a8202e" stroke-width="5"/><path d="M168,74 L176,98 M172,74 L182,94" stroke="#a8202e" stroke-width="3"/>` + sideMask('scar');
     case 'maskFace': return `<g transform="translate(120,100) scale(2.9)">${maskShape('sun')}</g>`;
+    case 'hyottoko': {
+      // Swordsmith's hyottoko mask: pink, round staring eyes, heavy brows, red cheeks, pursed spout mouth.
+      let seam = '';
+      for (let i = 0; i < 26; i++) { const t = (i / 26) * Math.PI * 2; seam += `M${(120 + Math.cos(t) * 41).toFixed(1)},${(100 + Math.sin(t) * 47).toFixed(1)} l${(Math.cos(t) * 4).toFixed(1)},${(Math.sin(t) * 4).toFixed(1)} `; }
+      return `<path d="M74,92 L62,88 M166,92 L178,88" stroke="#c8b898" stroke-width="2"/>
+        <ellipse cx="120" cy="100" rx="47" ry="53" fill="#e9868e" class="ol"/><path d="${seam}" stroke="#b85a64" stroke-width="1.4"/>
+        <path d="M152,64 Q172,100 148,148 L172,148 L172,64Z" fill="#000" opacity=".1"/>
+        <path d="M86,80 Q98,64 112,80 M128,80 Q142,64 154,80" fill="none" stroke="#1a1014" stroke-width="5.5" stroke-linecap="round"/>
+        ${[100, 140].map((x) => `<circle cx="${x}" cy="96" r="10" fill="#fff" class="ol" stroke-width="2"/><circle cx="${x}" cy="97" r="5.2" fill="#1a1014"/>`).join('')}
+        <circle cx="92" cy="118" r="8" fill="#b8202e"/><circle cx="148" cy="118" r="8" fill="#b8202e"/>
+        <path d="M120,104 Q114,114 120,116 Q126,114 120,104" fill="none" stroke="#b85a64" stroke-width="2"/>
+        <path d="M114,126 L156,138 Q164,140 160,146 L116,138Z" fill="#e47c86" class="ol" stroke-width="2"/><ellipse cx="160" cy="142" rx="3.4" ry="4" fill="#5a1e2a"/>`;
+    }
+    case 'tengu': return `<g transform="translate(160,50) rotate(24)"><path d="M-15,-6 Q-15,-21 0,-21 Q15,-21 15,-6 Q15,10 0,19 Q-15,10 -15,-6Z" fill="#c8302a" class="ol"/>
+      <path d="M-2,-4 L22,-22 L4,4Z" fill="#b02824" class="ol" stroke-width="1.4"/><path d="M-12,-10 Q-6,-16 -1,-10 M12,-10 Q6,-16 1,-10" fill="none" stroke="#fff" stroke-width="3"/>
+      <circle cx="-6" cy="-5" r="2" fill="#f0c23a"/><circle cx="6" cy="-5" r="2" fill="#f0c23a"/><path d="M-6,10 Q0,13 6,10" stroke="#1a1014" stroke-width="1.6" fill="none"/></g>`;
+    case 'muzzle': return `<path d="M96,129 L74,116 M144,129 L166,116" stroke="#a8202e" stroke-width="2.2"/>
+      <rect x="94" y="123" width="52" height="12" rx="6" fill="#7a9a4a" class="ol" stroke-width="1.8"/><path d="M110,123 L110,135 M130,123 L130,135" stroke="#4a6a2a" stroke-width="2"/><path d="M98,126 L142,126" stroke="#b8d08a" stroke-width="1.6"/>`;
+    case 'eyepatch': return `<path d="M66,76 L176,124 M70,124 L132,104" stroke="#1a1014" stroke-width="2.4"/><ellipse cx="140" cy="104" rx="14" ry="12" fill="#1a1014" class="ol"/>`;
+    case 'kanzashi': return `<path d="M136,40 L170,70" stroke="#d9a83a" stroke-width="2.6"/><g transform="translate(140,44)">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-5" rx="3.6" ry="5" fill="${color}" class="ol" stroke-width="1" transform="rotate(${a})"/>`).join('')}<circle r="2.6" fill="#f0c23a"/></g>
+      ${[0, 1, 2, 3].map((i) => `<circle cx="${146 + i}" cy="${54 + i * 7}" r="2.4" fill="${i % 2 ? '#e8ecf4' : color}" class="ol" stroke-width=".8"/>`).join('')}<path d="M144,48 L149,74" stroke="#d9a83a" stroke-width="1"/>`;
+    case 'oniHorns': return `<path d="M70,66 Q120,46 170,66" fill="none" stroke="#2a2a30" stroke-width="5"/>
+      <path d="M92,58 Q86,30 96,22 Q102,40 106,54Z M148,58 Q154,30 144,22 Q138,40 134,54Z" fill="${color}" class="ol" stroke-width="1.8"/>`;
     case 'bigButterfly': {
       const wing = `<path d="M0,0 C-6,-22 -30,-28 -30,-10 C-30,0 -14,2 0,0Z" fill="url(#bfly)" class="ol" stroke-width="1.4"/><path d="M0,2 C-16,4 -24,18 -12,22 C-4,24 0,12 0,2Z" fill="url(#bfly)" class="ol" stroke-width="1.4"/>
         <path d="M-2,-2 L-24,-14 M-4,-1 L-20,-4 M-2,3 L-14,14" stroke="${INK}" stroke-width="1"/><circle cx="-24" cy="-8" r="1.4" fill="#fff"/><circle cx="-26" cy="-14" r="1.2" fill="#fff"/>`;
@@ -291,9 +320,22 @@ function accessory(style, color) {
   }
 }
 
+/* ---------------- shoulder buddies ---------------- */
+function shoulderPet(kind, x, y) {
+  if (kind === 'crow') return `<g transform="translate(${x},${y - 8}) scale(.8)" style="filter:drop-shadow(0 0 1.5px #b8c4e8)"><g stroke="#0c0e18" stroke-width="2" stroke-linejoin="round">
+    <path d="M18,6 L34,14 L30,22Z" fill="#181b2c"/><path d="M-16,4 Q-12,-14 4,-14 Q18,-12 20,2 Q14,14 -4,14 Q-14,12 -16,4Z" fill="#1e2236"/>
+    <path d="M-8,0 Q4,-6 16,2 Q6,10 -10,8Z" fill="#283050"/><circle cx="-12" cy="-16" r="9" fill="#1e2236"/><path d="M-19,-20 Q-31,-21 -34,-14 Q-27,-14 -21,-11Z" fill="#2c3048"/></g>
+    <circle cx="-15" cy="-18" r="2.2" fill="#cdd0de"/><path d="M-4,14 L-5,22 M4,14 L5,22" stroke="#14161f" stroke-width="2"/></g>`;
+  if (kind === 'sparrow') return `<g transform="translate(${x},${y}) scale(.55)"><g stroke="#3a2418" stroke-width="2" stroke-linejoin="round">
+    <path d="M14,2 L30,8 L24,14Z" fill="#6a4a30"/><ellipse cx="2" cy="2" rx="17" ry="13" fill="#b8865a"/><ellipse cx="-2" cy="7" rx="11" ry="7" fill="#f2e6d0"/>
+    <path d="M2,-4 Q14,-6 18,4 Q8,8 0,4Z" fill="#7a5034"/><circle cx="-10" cy="-10" r="9" fill="#8a5a36"/><path d="M-18,-10 L-25,-8 L-18,-6Z" fill="#e8c060"/></g>
+    <circle cx="-13" cy="-12" r="2" fill="#1a1014"/><ellipse cx="-12" cy="-4" rx="4" ry="2.6" fill="#ff9aa8" opacity=".6"/><path d="M-4,14 L-5,20 M4,14 L5,20" stroke="#3a2418" stroke-width="2"/></g>`;
+  return '';
+}
+
 /* ---------------- species heads ---------------- */
 // Boar: a shaggy grey boar-head mask with pink-tipped ears, big blue eyes, pink snout and tusks.
-function boarHead(fur, p) {
+function boarHead(fur, p, eyeColor = '#3462cc', eyeStyle = 'round') {
   const beard = shade(fur, -0.32), cx = 120, cy = 96;
   let d = '';
   for (let i = 0; i <= 48; i++) {
@@ -306,7 +348,12 @@ function boarHead(fur, p) {
   let strokes = '';
   for (let i = 0; i < 22; i++) { const x = 78 + ((i * 37) % 84), y = 54 + ((i * 23) % 40); strokes += `M${x},${y} l${(i % 3) - 1},5 `; }
   const ear = `<path d="M86,58 L72,22 L106,46Z" fill="#7a6e8e" class="ol"/><path d="M84,50 L76,30 L98,44Z" fill="#e8869e"/>`;
-  const eye = `<path d="M82,98 Q98,80 116,96 Q100,114 82,98Z" fill="#14101c"/><circle cx="99" cy="97" r="9.5" fill="#3462cc"/><circle cx="99" cy="97" r="6" fill="#6f9cf2"/><circle cx="99" cy="97" r="2.8" fill="#0c1230"/><circle cx="95.5" cy="93.5" r="2.6" fill="#fff"/>
+  const big = eyeStyle === 'wide' ? 1.2 : 1;
+  const eye = eyeStyle === 'happy'
+    ? `<path d="M84,100 Q99,84 114,100" fill="none" stroke="#14101c" stroke-width="4" stroke-linecap="round"/>`
+    : `<path d="M82,98 Q98,80 116,96 Q100,114 82,98Z" fill="#14101c" transform="translate(99 97) scale(${big}) translate(-99 -97)"/><circle cx="99" cy="97" r="${9.5 * big}" fill="${eyeColor}"/><circle cx="99" cy="97" r="${6 * big}" fill="${shade(eyeColor, 0.35)}"/><circle cx="99" cy="97" r="2.8" fill="#0c1230"/><circle cx="95.5" cy="93.5" r="2.6" fill="#fff"/>
+    ${eyeStyle === 'sleepy' ? `<path d="M80,97 Q99,80 118,95 L118,86 L80,86Z" fill="${fur}" class="ol" stroke-width="1.6"/>` : ''}
+    ${eyeStyle === 'fierce' || eyeStyle === 'sharp' ? `<path d="M80,82 L116,92" stroke="#14101c" stroke-width="4" stroke-linecap="round"/>` : ''}
     <path d="M80,88 Q96,76 114,84 M84,108 Q98,114 110,108" fill="none" stroke="${beard}" stroke-width="1.6"/>`;
   return `<defs><clipPath id="${p}bh"><path d="${d}Z"/></clipPath></defs>
     ${ear}${mirror(ear)}
@@ -320,34 +367,21 @@ function boarHead(fur, p) {
     <path d="M94,142 Q88,132 93,121 Q98,132 101,140Z M146,142 Q152,132 147,121 Q142,132 139,140Z" fill="#fffaf0" class="ol" stroke-width="1.4"/>`;
 }
 
-// Swordsmith: a comic hyottoko mask, wild curly hair and a polka-dot headband with two knives.
-function smithHead(L) {
-  const hair = L.hairColor || '#1b1416';
-  let curls = '';
-  for (let i = 0; i < 22; i++) {
-    const a = ((150 + i * 11.5) * Math.PI) / 180, r = 58 + (i % 3) * 6;
-    curls += `<circle cx="${(120 + Math.cos(a) * r).toFixed(1)}" cy="${(98 + Math.sin(a) * r * 0.95).toFixed(1)}" r="${13 + (i % 4) * 2}" fill="${hair}" class="ol"/>`;
-  }
-  for (const [x, y] of [[58, 140], [182, 140], [64, 166], [176, 166]]) curls += `<circle cx="${x}" cy="${y}" r="14" fill="${hair}" class="ol"/>`;
-  const knife = (x) => `<path d="M${x - 4},76 L${x - 4},30 Q${x},18 ${x + 4},30 L${x + 4},76Z" fill="#dfe4ec" class="ol" stroke-width="1.6"/><path d="M${x + 1},30 L${x + 1},74" stroke="#fff" stroke-width="1.2"/>`;
-  let dots = '';
-  for (let x = 76; x <= 164; x += 11) dots += `<circle cx="${x}" cy="${74 - Math.sin(((x - 70) / 100) * Math.PI) * 7}" r="2.6" fill="${INK}"/>`;
-  return `${curls}${knife(104)}${knife(136)}
-    <ellipse cx="120" cy="102" rx="46" ry="50" fill="#f0dcc0" class="ol"/>
-    <path d="M150,66 Q172,104 146,148 L170,148 L170,66Z" fill="#000" opacity=".1"/>
-    <path d="M88,86 Q98,78 110,86 M130,86 Q142,78 152,86" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>
-    ${[100, 140].map((x) => `<circle cx="${x}" cy="100" r="8.5" fill="#fff" class="ol" stroke-width="2"/><circle cx="${x + 1}" cy="101" r="4.4" fill="${INK}"/>`).join('')}
-    <ellipse cx="94" cy="118" rx="7" ry="4" fill="#ff8a8a" opacity=".5"/><ellipse cx="146" cy="118" rx="7" ry="4" fill="#ff8a8a" opacity=".5"/>
-    <path d="M118,112 L114,122 L120,122" fill="none" stroke="${shade('#f0dcc0', -0.4)}" stroke-width="1.8"/>
-    <path d="M114,132 Q122,124 128,128" fill="none" stroke="${INK}" stroke-width="1.6"/>
-    <ellipse cx="132" cy="130" rx="8" ry="7" fill="#e8848a" class="ol" stroke-width="2"/><ellipse cx="134" cy="130" rx="3" ry="2.6" fill="#5a1e2a"/>
-    <path d="M68,72 Q120,56 172,72 L172,86 Q120,70 68,86Z" fill="#f7f4ee" class="ol" stroke-width="1.8"/>${dots}`;
-}
-
 // Muscle Mouse body (its own proportions: huge head and torso, thin legs, ragged fur shorts).
 function capsule(x1, y1, x2, y2, r1, r2, fill) {
   const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len, f = (v) => v.toFixed(1);
   return `<path d="M${f(x1 + nx * r1)},${f(y1 + ny * r1)} L${f(x2 + nx * r2)},${f(y2 + ny * r2)} L${f(x2 - nx * r2)},${f(y2 - ny * r2)} L${f(x1 - nx * r1)},${f(y1 - ny * r1)}Z" fill="${fill}"/><circle cx="${f(x1)}" cy="${f(y1)}" r="${r1}" fill="${fill}"/><circle cx="${f(x2)}" cy="${f(y2)}" r="${r2}" fill="${fill}"/>`;
+}
+
+function mouseEye(x, style, color, fur) {
+  const side = x < 120 ? -1 : 1, ring = color ? shade(color, -0.1) : '#6e6880';
+  if (style === 'happy') return `<path d="M${x - 13},134 Q${x},114 ${x + 13},134" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/>`;
+  const r = style === 'wide' ? 18.5 : 16;
+  let e = `<circle cx="${x}" cy="128" r="${r}" fill="#1a1420" class="ol" stroke-width="1.6"/><circle cx="${x}" cy="128" r="${r * 0.72}" fill="none" stroke="${ring}" stroke-width="1.8"/><circle cx="${x - 6}" cy="121" r="4.2" fill="#fff"/><circle cx="${x + 5}" cy="134" r="1.8" fill="#fff"/>`;
+  if (style === 'sleepy') e += `<path d="M${x - 17},127 A17,17 0 0,1 ${x + 17},127Z" fill="${fur}" class="ol" stroke-width="1.8"/>`;
+  if (style === 'fierce' || style === 'sharp') e += `<path d="M${x - 16 * side * -1},${side < 0 ? 104 : 114} L${x + 14 * side * -1},${side < 0 ? 114 : 104}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`;
+  if (style === 'gentle') e += `<path d="M${x - 14},106 Q${x},100 ${x + 14},106" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`;
+  return e;
 }
 
 export function renderMouse(L, opts = {}) {
@@ -365,7 +399,7 @@ export function renderMouse(L, opts = {}) {
     <path d="M100,136 Q120,198 140,136 Q120,148 100,136Z" fill="${light}" class="ol" stroke-width="1.8"/>
     <ellipse cx="120" cy="184" rx="5.5" ry="4" fill="#2a2030"/>
     <path d="M113,176 L82,168 M113,180 L84,184 M127,176 L158,168 M127,180 L156,184" stroke="${INK}" stroke-width="1.3" opacity=".8"/>
-    ${[98, 142].map((x) => `<circle cx="${x}" cy="128" r="16" fill="#1a1420" class="ol" stroke-width="1.6"/><circle cx="${x}" cy="128" r="11.5" fill="none" stroke="#6e6880" stroke-width="1.6"/><circle cx="${x - 6}" cy="121" r="4.2" fill="#fff"/><circle cx="${x + 5}" cy="134" r="1.8" fill="#fff"/>`).join('')}
+    ${[98, 142].map((x) => mouseEye(x, L.eyes, L.eyeColor, fur)).join('')}
     <path d="M64,98 Q120,74 176,98 L174,116 Q120,92 66,116Z" fill="#efe4c4" class="ol" stroke-width="2"/>
     <path d="M70,104 Q120,82 170,104" fill="none" stroke="#c8b890" stroke-width="1.4"/>
     ${[[120, 95, 13, 9], [92, 102, 6, 6], [148, 102, 6, 6]].map(([x, y, w, h]) => `<path d="M${x - w},${y} L${x - w * 0.5},${y - h} L${x + w * 0.5},${y - h} L${x + w},${y} L${x + w * 0.5},${y + h} L${x - w * 0.5},${y + h}Z" fill="${gem}" class="ol" stroke-width="1.4"/><path d="M${x - w * 0.5},${y - h} L${x},${y} L${x + w * 0.5},${y - h} M${x - w},${y} L${x + w},${y}" stroke="#fff" stroke-width=".9" opacity=".8"/>`).join('')}
@@ -639,6 +673,7 @@ const SHADE = 'fill="#000" opacity=".2"';
 
 export function renderAvatar(look, opts = {}) {
   if (look.species === 'mouse') return renderMouse(look, opts);
+  if (look.species === 'smith') look = { ...look, species: 'human', accessory: 'hyottoko', headgear: look.headgear && look.headgear !== 'none' ? look.headgear : 'knifeBand' };
   const p = `av${++uid}`;
   const L = look;
   const uc = L.uniformColor;
@@ -677,14 +712,14 @@ export function renderAvatar(look, opts = {}) {
     <path d="M98,26 Q90,50 100,76 M122,22 Q118,48 126,70 M146,28 Q156,52 148,80 M80,44 Q72,66 82,90 M164,46 Q172,70 162,94" fill="none" stroke="#000" stroke-width="1.6" opacity=".3"/>
     <path d="M86,44 Q120,28 154,44" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".3"/></g>`;
   const species = L.species || 'human';
-  const headFront = species === 'boar' ? boarHead(L.furColor || '#9a948e', p)
-    : species === 'smith' ? smithHead(L) + earrings + headgear(L.headgear, L.headgearColor || '#c0303a')
+  const headFront = species === 'boar' ? boarHead(L.furColor || '#9a948e', p, L.eyeColor || '#3462cc', L.eyes)
     : `${ears}${face}${blush}${eyes}${nose(L.nose, skin)}${mouth(L.mouth)}${hairFront}${brows}${scar(L.scar, skin)}${mark(L.mark, skin)}${earrings}${accessory(L.accessory, L.accColor)}${headgear(L.headgear, L.headgearColor || '#c0303a')}`;
   const style = `<style>.ol{stroke:${INK};stroke-width:2;stroke-linejoin:round}.hd .ol{stroke-width:3.2}</style>`;
   const label = opts.name ? opts.name.replace(/[<>"&]/g, '') : 'Your character';
 
   if (opts.headOnly) {
-    return `<svg viewBox="56 22 128 128" class="avatar-svg" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${style}<defs>${defs}</defs>${species === 'human' ? hairBack : ''}${headFront}</svg>`;
+    const vb = species === 'boar' ? '40 14 160 160' : '56 22 128 128';
+    return `<svg viewBox="${vb}" class="avatar-svg" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${style}<defs>${defs}</defs>${species === 'human' ? hairBack : ''}${headFront}</svg>`;
   }
 
   /* body */
@@ -816,13 +851,21 @@ export function renderAvatar(look, opts = {}) {
   const sc = L.scarfColor || '#4a7ad8', scD = shade(sc, -0.3);
   const ribs = (x0, x1, y0, y1) => { let r = ''; for (let x = x0; x <= x1; x += 4.5) r += `M${x},${y0} L${x + 1},${y1} `; return `<path d="${r}" stroke="${scD}" stroke-width="1.2"/>`; };
   let scarfFront = '', scarfBack = '';
+  const sp = L.scarfPattern || 'plain';
+  if (sp !== 'plain') {
+    const tile = sp === 'stripes' ? `<rect width="10" height="10" fill="${sc}"/><rect y="5" width="10" height="5" fill="${scD}"/>`
+      : sp === 'checks' ? `<rect width="10" height="10" fill="${sc}"/><rect width="5" height="5" fill="${scD}"/><rect x="5" y="5" width="5" height="5" fill="${scD}"/>`
+      : `<rect width="10" height="10" fill="${sc}"/><circle cx="5" cy="5" r="1.8" fill="#fff" opacity=".85"/>`;
+    defs += `<pattern id="${p}sp" width="10" height="10" patternUnits="userSpaceOnUse">${tile}</pattern>`;
+  }
+  const scFill = sp === 'plain' ? sc : `url(#${p}sp)`;
   if (L.scarf && L.scarf !== 'none') {
     const high = L.scarf === 'wrap';
     const top = high ? 88 : 96;
-    scarfFront = `<path d="M94,${top} Q120,${top + 8} 146,${top} L150,122 Q120,132 90,122Z" fill="${sc}" class="ol"/>${ribs(96, 144, top + 4, 124)}
+    scarfFront = `<path d="M94,${top} Q120,${top + 8} 146,${top} L150,122 Q120,132 90,122Z" fill="${scFill}" class="ol"/>${ribs(96, 144, top + 4, 124)}
       <path d="M92,${top + 13} Q120,${top + 22} 148,${top + 13}" fill="none" stroke="${scD}" stroke-width="2.2"/>`;
-    if (L.scarf === 'knit') scarfFront += `<path d="M124,118 L142,116 L147,178 L129,180Z" fill="${sc}" class="ol"/>${ribs(127, 143, 120, 176)}<path d="M130,180 l-1,7 M134,180 l0,7 M138,179 l1,7 M142,179 l1,7 M146,178 l2,6" stroke="${sc}" stroke-width="2"/>`;
-    if (L.scarf === 'long') scarfBack = `<path d="M140,100 Q186,94 212,116 Q228,132 238,126 L236,144 Q214,152 198,136 Q180,118 146,120Z" fill="${sc}" class="ol"/><path d="M160,104 Q190,104 214,124" fill="none" stroke="${scD}" stroke-width="1.6"/>`;
+    if (L.scarf === 'knit') scarfFront += `<path d="M124,118 L142,116 L147,178 L129,180Z" fill="${scFill}" class="ol"/>${ribs(127, 143, 120, 176)}<path d="M130,180 l-1,7 M134,180 l0,7 M138,179 l1,7 M142,179 l1,7 M146,178 l2,6" stroke="${sc}" stroke-width="2"/>`;
+    if (L.scarf === 'long') scarfBack = `<path d="M140,100 Q186,94 212,116 Q228,132 238,126 L236,144 Q214,152 198,136 Q180,118 146,120Z" fill="${scFill}" class="ol"/><path d="M160,104 Q190,104 214,124" fill="none" stroke="${scD}" stroke-width="1.6"/>`;
   }
   let cape = '';
   if (L.cape === 'mino') {
@@ -868,7 +911,7 @@ export function renderAvatar(look, opts = {}) {
     <g transform="${stance(1)}">${legsL}</g><g transform="${stance(-1)}">${legsR}</g>${legsTop}
     ${scarfBack}${neck}${torso}${haoriFront}${scarfFront}
     ${weaponExtra}${armL}${armRight}${cape}
-    <g class="hd" transform="${headT}">${headFront}</g>
+    <g class="hd" transform="${headT}">${headFront}</g>${shoulderPet(L.pet, 120 + S - 2, 104)}
   </g>`;
 
   return `<svg viewBox="0 -10 240 416" class="avatar-svg" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${style}<defs>${defs}</defs>${body}</svg>`;

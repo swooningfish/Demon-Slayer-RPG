@@ -1,6 +1,6 @@
-# Onigari (鬼狩り): Blade of Dawn
+# Demon Slayer RPG
 
-*Onigari* is Japanese for "demon hunting". A fan-made, kid-friendly demon hunter adventure that runs in the browser and installs like an app on Android and iPhone.
+An unofficial, fan-made, kid-friendly demon slayer adventure that runs in the browser and installs like an app on Android and iPhone.
 
 ## Features (Chapter 1: The Forest)
 

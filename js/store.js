@@ -65,6 +65,7 @@ export function newGame(slot) {
 // Fill in fields added after a save was made, so old saves keep working.
 function migrate(s) {
   const base = newGame(s.slot);
+  if (s.look?.species === 'smith') s.look = { ...s.look, species: 'human', accessory: 'hyottoko', headgear: 'knifeBand' };
   return {
     ...base, ...s,
     look: { ...base.look, ...s.look }, weapon: { ...base.weapon, ...s.weapon },
@@ -76,14 +77,14 @@ export function exportSave(game) {
   const blob = new Blob([JSON.stringify(game, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `onigari-${(game.name || 'slayer').replace(/\W+/g, '_')}.json`;
+  a.download = `demon-slayer-rpg-${(game.name || 'slayer').replace(/\W+/g, '_')}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
 export async function importSave(file, slot) {
   const data = JSON.parse(await file.text());
-  if (!data || typeof data !== 'object' || !data.look || !data.stats) throw new Error('Not a Slayer\'s Path save file');
+  if (!data || typeof data !== 'object' || !data.look || !data.stats) throw new Error('Not a Demon Slayer RPG save file');
   const game = migrate({ ...data, slot });
   saveGame(game);
   return game;

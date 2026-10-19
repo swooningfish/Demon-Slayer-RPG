@@ -1,7 +1,7 @@
 // Offline support: cache the app shell. Network first (so updates show straight away), cache when offline.
 // Bump VERSION whenever files change so players get the update.
-const VERSION = 'v2';
-const CACHE = `onigari-${VERSION}`;
+const VERSION = 'v3';
+const CACHE = `demon-slayer-rpg-${VERSION}`;
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',
   'js/main.js', 'js/ui.js', 'js/store.js', 'js/data.js', 'js/game.js', 'js/avatar.js', 'js/demons.js',

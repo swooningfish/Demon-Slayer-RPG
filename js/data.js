@@ -32,9 +32,12 @@ export const HAIR = [o('spiky', 'Spiky'), o('wild', 'Wild mane'), o('neat', 'Sid
 export const HAIR_FADE = [o('soft', 'Soft tips'), o('sharp', 'Sharp ends'), o('ends', 'Just the ends'), o('full', 'Full fade')];
 export const ACCESSORY = [o('none', 'None'), o('foxMask', 'Fox mask'), o('ribbon', 'Ribbon'), o('butterfly', 'Butterfly clips'),
   o('bigButterfly', 'Big butterfly'), o('headband', 'Jewel headband'), o('flower', 'Flower pin'),
-  o('sunMask', 'Warding mask'), o('flowerMask', 'Flower cat mask'), o('scarMask', 'Scarred fox mask'), o('maskFace', 'Mask over face')];
-export const HEADGEAR = [o('none', 'None'), o('kasa', 'Straw hat (kasa)'), o('hachimaki', 'Hachimaki band'), o('jingasa', 'Jingasa hat'), o('zukin', 'Zukin hood'), o('tenugui', 'Tenugui cloth')];
-export const SPECIES = [o('human', 'Human'), o('mouse', 'Muscle Mouse'), o('boar', 'Boar Mask'), o('smith', 'Swordsmith Mask')];
+  o('sunMask', 'Warding mask'), o('flowerMask', 'Flower cat mask'), o('scarMask', 'Scarred fox mask'), o('maskFace', 'Warding mask on face'), o('hyottoko', 'Swordsmith mask'),
+  o('tengu', 'Tengu mask'), o('muzzle', 'Bamboo muzzle'), o('eyepatch', 'Eyepatch'), o('kanzashi', 'Kanzashi hairpin'), o('oniHorns', 'Oni horns')];
+export const HEADGEAR = [o('none', 'None'), o('kasa', 'Straw hat (kasa)'), o('hachimaki', 'Hachimaki band'), o('jingasa', 'Jingasa hat'), o('zukin', 'Zukin hood'), o('tenugui', 'Tenugui cloth'), o('knifeBand', 'Swordsmith knife band')];
+export const SCARF_PATTERN = [o('plain', 'Plain'), o('stripes', 'Stripes'), o('checks', 'Checks'), o('dots', 'Dots')];
+export const PETS = [o('none', 'None'), o('crow', 'Kasugai crow'), o('sparrow', 'Sparrow')];
+export const SPECIES = [o('human', 'Human'), o('mouse', 'Muscle Mouse'), o('boar', 'Boar Mask')];
 export const BODY = [o('masc', 'Masculine'), o('fem', 'Feminine')];
 export const FUR = ['#bdb6c4', '#e8e4ec', '#8a7a6a', '#6b4a35', '#4a4048', '#d8b48a'];
 export const BUILD = [o('slim', 'Slim'), o('regular', 'Regular'), o('strong', 'Strong')];
@@ -70,7 +73,7 @@ export const OUTFIT_PRESETS = [
   { name: 'Love', note: 'Mitsuri style', set: { uniform: 'open', uniformColor: '#1d2233', haori: 'plain', haoriColor: '#f2efe6', haoriColor2: '#f2efe6', pants: 'skirt', shoes: 'boots', hair: 'braids', hairColor: '#ff7aa8', hairTip: '#8ad6b0', hairFade: 'sharp', body: 'fem' } },
   { name: 'Boar Pelt', note: 'Inosuke style', set: { species: 'boar', uniform: 'bare', haori: 'none', pants: 'baggy', pantsColor: '#26304a', shoes: 'furBoots', furColor: '#9a948e' },
     weapon: { type: 'jagged', blade: '#7a8aa0', guard: 'none', wrap: '#e8e4ec' } },
-  { name: 'Swordsmith', note: 'Hyottoko mask', set: { species: 'smith', uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'none', pants: 'hakama', pantsColor: '#b8ac90', shoes: 'geta', hairColor: '#1b1416' },
+  { name: 'Swordsmith', note: 'Hyottoko mask', set: { uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'none', pants: 'hakama', pantsColor: '#b8ac90', shoes: 'geta', hair: 'bob', hairColor: '#1b1416', accessory: 'hyottoko', headgear: 'knifeBand' },
     weapon: { type: 'dual', blade: '#c0c6cf', guard: 'none', wrap: '#5a3a24' } },
   { name: 'Muscle Mouse', note: 'Flex!', set: { species: 'mouse', accColor: '#d8a6e8', furColor: '#c9c4d6', shortsColor: '#3a2a4a' } },
   { name: 'Hemp Kimono', note: 'Nezuko style', set: { uniform: 'kimono', uniformColor: '#e05a8a', haori: 'plain', haoriColor: '#5a1e2a', haoriColor2: '#5a1e2a', pants: 'skirt', shoes: 'zori', accessory: 'ribbon', accColor: '#e05a8a', hair: 'long', hairColor: '#1b1416', hairTip: '#ff8c2e', hairFade: 'ends', body: 'fem' } },
@@ -79,7 +82,7 @@ export const OUTFIT_PRESETS = [
 
 export const DEFAULT_LOOK = {
   species: 'human', body: 'masc', furColor: '#c9c4d6', shortsColor: '#3a2a4a', hairFade: 'soft',
-  scarf: 'none', scarfColor: '#4a7ad8', headgear: 'none', headgearColor: '#c0303a', cape: 'none', armbands: 'none', wrapColor: '#f2efe6', pantsColor: '',
+  scarf: 'none', scarfColor: '#4a7ad8', headgear: 'none', headgearColor: '#c0303a', scarfPattern: 'plain', pet: 'none', cape: 'none', armbands: 'none', wrapColor: '#f2efe6', pantsColor: '',
   skin: '#f9d4b8', face: 'oval', eyes: 'round', eyeColor: '#b3262e', eyeColor2: '', brows: 'soft', nose: 'line',
   mouth: 'smile', ears: 'normal', earrings: 'none', earringColor: '#d9a83a', scar: 'none', mark: 'none', blush: true,
   hair: 'spiky', hairColor: '#3a2622', hairTip: '', accessory: 'none', accColor: '#e05a8a',

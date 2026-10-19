@@ -1,7 +1,7 @@
 {
-  "name": "Onigari: Blade of Dawn",
-  "short_name": "Onigari",
-  "description": "Onigari (鬼狩り, oh-nee-GAH-ree) means Demon Hunter. Create your hunter, train, slay demons and rise to Hashira.",
+  "name": "Demon Slayer RPG",
+  "short_name": "Slayer RPG",
+  "description": "Unofficial fan-made Demon Slayer RPG. Create your slayer, train, slay demons and rise to Hashira.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
