@@ -1,7 +1,7 @@
 // Character + weapon creator. Used for a new slayer and for the wardrobe / swordsmith later.
 import * as D from './data.js';
 import { renderAvatar, mangaWeaponArt, guardFace } from './avatar.js';
-import { app, go, save, esc, toast } from './ui.js';
+import { app, go, save, esc, toast, modal } from './ui.js';
 
 const TABS = [
   { id: 'face', label: 'Face' }, { id: 'eyes', label: 'Eyes' }, { id: 'hair', label: 'Hair' }, { id: 'marks', label: 'Marks' },
@@ -30,6 +30,10 @@ const GROUPS = {
 };
 
 const isColorList = (opts) => typeof opts[0] === 'string';
+
+// Everything that counts as an "item" (worn or attached), and its cleared value.
+const NO_ITEMS = { accessory: 'none', headgear: 'none', scarf: 'none', scarfPattern: 'plain', cape: 'none', armbands: 'none',
+  pet: 'none', earrings: 'none', scar: 'none', mark: 'none' };
 
 // Which look options actually change each character type. Everything else is hidden.
 const HUMAN_ONLY = ['face', 'ears', 'nose', 'mouth', 'blush', 'eyeColor2', 'brows', 'hair', 'hairColor', 'hairTip', 'hairFade', 'accessory', 'accColor',
@@ -91,7 +95,8 @@ export function creatorScreen(root, params) {
     <header class="topbar">
       <button class="icon-btn" data-act="back" aria-label="Back">‹</button>
       <h1>${isNew ? 'Create your slayer' : params.tab === 'weapon' ? 'Swordsmith' : 'Wardrobe'}</h1>
-      <button class="icon-btn" data-act="random" aria-label="Randomise look" title="Randomise">🎲</button>
+      <div class="topbar-btns"><button class="icon-btn" data-act="reset" aria-label="Reset" title="Reset">↺</button>
+      <button class="icon-btn" data-act="random" aria-label="Randomise look" title="Randomise">🎲</button></div>
     </header>
     <div class="creator">
       <div class="stage"><div class="stage-avatar"></div><div class="stage-weapon"></div><button class="pose-btn" data-act="pose" aria-pressed="false">⚔️ Battle pose</button></div>
@@ -198,7 +203,7 @@ export function creatorScreen(root, params) {
     save();
   }
 
-  root.addEventListener('click', (e) => {
+  root.addEventListener('click', async (e) => {
     const t = e.target.closest('button');
     if (!t) return;
     if (t.dataset.tab) { tab = t.dataset.tab; panel.scrollTop = 0; redraw(); return; }
@@ -223,6 +228,16 @@ export function creatorScreen(root, params) {
     }
     switch (t.dataset.act) {
       case 'random': Object.assign(look, randomLook()); redraw(); break;
+      case 'reset': {
+        const choice = await modal({
+          title: 'Reset',
+          body: '<p><b>Remove all items</b> takes off masks, accessories, headgear, scarves, capes, arm bands, shoulder buddies, earrings, scars and marks. Your face, hair, body and outfit stay.</p><p><b>Start over</b> puts your whole look and weapon back to the default slayer. Your name, crow and difficulty stay.</p>',
+          actions: [{ label: 'Remove all items', value: 'items', primary: true }, { label: 'Start over', value: 'all', danger: true }, { label: 'Cancel', value: null }],
+        });
+        if (choice === 'items') { Object.assign(look, NO_ITEMS); redraw(); toast('All items removed'); }
+        if (choice === 'all') { Object.assign(look, D.DEFAULT_LOOK); Object.assign(weapon, D.DEFAULT_WEAPON); pose = 'idle'; root.querySelector('.pose-btn').setAttribute('aria-pressed', 'false'); redraw(); toast('Back to the default slayer'); }
+        break;
+      }
       case 'rname': name = randomName(look); drawPanel(); drawStage(); break;
       case 'rcrow': crow = pickR(D.CROW_NAMES.filter((c) => c !== crow)); drawPanel(); break;
       case 'pose': pose = pose === 'idle' ? 'action' : 'idle'; t.setAttribute('aria-pressed', pose === 'action'); drawStage(); break;

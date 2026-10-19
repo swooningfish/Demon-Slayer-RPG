@@ -1,6 +1,6 @@
 // Offline support: cache the app shell. Network first (so updates show straight away), cache when offline.
 // Bump VERSION whenever files change so players get the update.
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = `demon-slayer-rpg-${VERSION}`;
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',

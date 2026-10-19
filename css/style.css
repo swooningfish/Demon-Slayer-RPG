@@ -365,3 +365,4 @@ small { color: var(--muted); }
 .logo .logo-say { margin-top: 4px; font-size: .92rem; }
 .logo-say b { color: var(--text); }
 .logo .logo-sub { font-style: italic; color: var(--accent); margin-top: 2px; }
+.topbar-btns { display: flex; gap: 6px; }
