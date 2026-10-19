@@ -276,7 +276,7 @@ export function patrolScreen(root) {
 async function startBoss() {
   const g = app.game;
   const boss = generateDemon({ level: 6, boss: true, seed: g.createdAt % 1e9 });
-  const ok = await modal({ title: '⛩️ The Old Shrine', body: `<div class="boss-prev">${renderDemon(boss)}</div><p><b>${esc(boss.name)}</b>, ${esc(boss.title)}, has been hiding here, guarding a secret.</p><p class="hint">Bosses use their Blood Demon Art every 2nd turn. Bring wisteria tea! (You have ${g.tea}.)</p>`,
+  const ok = await modal({ title: '⛩️ The Old Shrine', body: `<div class="boss-prev">${renderDemon(boss)}</div><p><b>${esc(boss.name)}</b>, ${esc(boss.title)}, has been hiding here, guarding a secret.</p><p class="hint">A Lower Moon of the Twelve Kizuki: its rank is carved into its eyes, and it uses its Blood Demon Art more often. Bring wisteria tea! (You have ${g.tea}.)</p>`,
     actions: [{ label: 'Prepare more', value: false }, { label: 'Enter the shrine', value: true, primary: true }] });
   if (!ok) return;
   go('battle', {

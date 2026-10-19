@@ -1,7 +1,7 @@
 // Turn-based battles. Player acts, then the demon. Statuses tick at the end of each round.
 import { BREATHING, DIFFICULTY } from './data.js';
 import { renderAvatar } from './avatar.js';
-import { renderDemon, ARTS } from './demons.js';
+import { renderDemon, ARTS, rankInfo } from './demons.js';
 import { renderScene, SCENES } from './scenes.js';
 import { app, go, save, esc, modal, bar } from './ui.js';
 import { activeWeapon, forms, addXp } from './game.js';
@@ -53,9 +53,9 @@ export function battleScreen(root, params) {
   function drawEnemy() {
     const art = ARTS[E.art];
     arena.style.setProperty('--art', art.color);
-    $('.enemy-info').innerHTML = `<div class="e-name">${E.boss ? '<span class="tag boss">BOSS</span>' : ''}${esc(E.name)} <small>${esc(E.title)}</small></div>
+    $('.enemy-info').innerHTML = `<div class="e-name">${E.boss ? `<span class="tag boss">${rankInfo(E.rank)?.label || 'BOSS'}</span>` : ''}${esc(E.name)} <small>${esc(E.title)}</small></div>
       ${bar(E.hp, E.max, 'hp demon')}<div class="sts">${statusIcons(E.st)}</div>
-      <button class="art-chip" data-act="art">Blood Demon Art: ${art.name} ⓘ</button>`;
+      <button class="art-chip" data-act="art">${art.fx === 'none' ? 'No Blood Demon Art' : `Blood Demon Art: ${art.name}`} ⓘ</button>`;
     sprite.innerHTML = renderDemon(E);
   }
   function drawBars() {
@@ -248,7 +248,7 @@ export function battleScreen(root, params) {
       delete E.st.stun;
     } else {
       E.turn++;
-      const useArt = E.turn % artEvery(E) === 0;
+      const useArt = ARTS[E.art]?.fx !== 'none' && E.turn % artEvery(E) === 0;
       if (useArt) await demonArt(); else await claw(1, pickVerb());
     }
     await sleep(350);
@@ -368,7 +368,10 @@ export function battleScreen(root, params) {
       case 'back': menu = 'main'; drawActions(); break;
       case 'art': {
         const art = ARTS[E.art];
-        modal({ title: art.name, body: `<p>${art.desc}</p><p class="hint">On ${DF.name}, this demon uses its Blood Demon Art every ${['', '', '2nd', '3rd', '4th'][artEvery(E)]} turn. They also heal a little each turn unless they are burning.</p>` });
+        const ri = rankInfo(E.rank);
+        const rankLine = ri ? `<p><b>${ri.label}</b> of the Twelve Kizuki: the rank is written in its eyes, and it is much stronger than a normal demon.</p>` : '';
+        const when = art.fx === 'none' ? 'It only attacks with claws and fangs.' : `On ${DF.name}, this demon uses its Blood Demon Art every ${['', '', '2nd', '3rd', '4th'][artEvery(E)]} turn.`;
+        modal({ title: art.name, body: `${rankLine}<p>${art.desc}</p><p class="hint">${when} Demons heal a little each turn unless they are burning, and only a Nichirin blade or sunlight can finish them.</p>` });
         break;
       }
       case 'strike': case 'focus': case 'tea': case 'flee': playerAction(t.dataset.act); break;

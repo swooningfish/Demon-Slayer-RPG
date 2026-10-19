@@ -371,3 +371,12 @@ small { color: var(--muted); }
 #ver { position: fixed; left: 8px; bottom: calc(4px + var(--safe-b)); z-index: 150; font-size: .66rem; color: var(--muted); opacity: .6; pointer-events: none; }
 #app.screen-battle ~ #ver { display: none; } /* battle shows it beside the scene name */
 #app.screen-title ~ #ver { display: none; }
+/* Demon Lab */
+.lab-h { font-size: 1rem; color: var(--muted); padding: 14px 16px 2px; }
+.stage { position: sticky; }
+.stage-rank { position: absolute; right: 10px; bottom: 10px; }
+.rank-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #3a0a14cc; border: 1px solid #ff5a6a; color: #ffd0d4; font-weight: 700; font-size: .8rem; }
+.rank-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; }
+.rank-chip { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .78rem; }
+.rank-chip b { font-size: 1.1rem; color: #ff8a94; letter-spacing: .1em; }
+.chip-tall .chip-prev { height: 120px; }

@@ -30,7 +30,7 @@ Your slayers are saved on that device only. The home-screen app keeps its own sa
 - **Difficulty**: Easy, Medium or Hard, chosen when you create a slayer and changeable in the Wardrobe.
 - **Immersive battle scenes**: 12 detailed, animated locations (night forest, frozen river, bamboo grove, Wisteria Mountain, the Old Shrine and more). Your slayer fights in an action pose.
 - **Turn-based battles**: strikes, breathing forms, Total Concentration, wisteria tea, and status effects. Demons have procedurally generated looks and Blood Demon Arts.
-- **Demon Lab**: design your own demons and spar with them.
+- **Demon Lab**: a full demon creator. Pick human-looking, semi-human or monstrous; slim, hulking, skinny, armoured or giant-spider bodies; human or spider faces; eye count, style and colour; horns, hair, face markings (dot chains, cheek bars, flower tattoo, veins); kimono, wraps or baggy trousers with web, stripe or flower patterns; and extras like body drums, a fur collar, beads, flowing sashes, spikes and blood sickles. Give it a Blood Demon Art or none, and a Twelve Kizuki rank (Lower or Upper Moon 1–6, shown as kanji in its eyes). Twelve ready-made stock demons can be fought or copied and edited.
 - **Saves**: 3 save slots in the browser's local storage, plus backup and import as a file. No account needed.
 - **Works offline** once installed.
 
