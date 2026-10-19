@@ -18,7 +18,10 @@ function titleScreen(root) {
   const when = (t) => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   root.innerHTML = `
     <div class="title-screen">
-      <div class="logo"><span class="logo-kanji" aria-hidden="true">滅</span><h1>Slayer's Path</h1><p>Create your slayer. Train. Rise to Hashira.</p></div>
+      <div class="logo"><span class="logo-kanji" aria-hidden="true">鬼</span><h1>Onigari</h1>
+        <p class="logo-jp">鬼狩り <button class="say-btn" data-act="say" aria-label="Hear how to say Onigari">🔊</button></p>
+        <p class="logo-say">Say it: <b>oh-nee-GAH-ree</b> · means <b>"Demon Hunter"</b></p>
+        <p class="logo-sub">Blade of Dawn</p><p>Create your hunter. Train. Rise to Hashira.</p></div>
       ${storageOk ? '' : '<p class="warn">Saving is blocked in this browser (private mode?). Progress will be lost when you close the page.</p>'}
       <div class="slots">${slots.map((s, i) => s ? `
         <div class="slot">
@@ -58,6 +61,15 @@ function titleScreen(root) {
           actions: [{ label: 'Keep', value: false, primary: true }, { label: 'Delete', value: true, danger: true }] });
         if (sure) { deleteSlot(i); go('title'); }
       }
+      return;
+    }
+    if (t.dataset.act === 'say') {
+      // Speak the name in Japanese if the device has a voice for it.
+      try {
+        const u = new SpeechSynthesisUtterance('おにがり');
+        u.lang = 'ja-JP'; u.rate = 0.8;
+        speechSynthesis.cancel(); speechSynthesis.speak(u);
+      } catch { toast('Say it: oh-nee-GAH-ree'); }
       return;
     }
     if (t.dataset.act === 'install' && installEvent) {

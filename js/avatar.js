@@ -37,8 +37,26 @@ function braids() {
   return d;
 }
 
+// Flame mane: flickering locks all round the head (tips get the tip colour).
+function flameMane() {
+  const cx = 120, cy = 92;
+  let d = 'M66,170 L60,150';
+  const n = 14, a0 = 160, a1 = 380;
+  for (let i = 0; i < n; i++) {
+    const t0 = ((a0 + ((a1 - a0) * i) / n) * Math.PI) / 180, t1 = ((a0 + ((a1 - a0) * (i + 1)) / n) * Math.PI) / 180;
+    const tm = (t0 + t1) / 2, rT = 78 + (i % 3) * 6, rV = 54;
+    const tip = [cx + Math.cos(tm) * rT + Math.sin(tm) * 8, cy + Math.sin(tm) * rT - Math.cos(tm) * 8];
+    const v = [cx + Math.cos(t1) * rV, cy + Math.sin(t1) * rV];
+    const c1 = [cx + Math.cos(t0) * 70, cy + Math.sin(t0) * 70];
+    d += ` Q${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${tip[0].toFixed(1)},${tip[1].toFixed(1)} Q${(cx + Math.cos(tm) * 60).toFixed(1)},${(cy + Math.sin(tm) * 60).toFixed(1)} ${v[0].toFixed(1)},${v[1].toFixed(1)}`;
+  }
+  return d + ' L182,150 L174,172 Q150,150 120,150 Q90,150 66,170Z';
+}
+const FLAME_FRONT = 'M62,106 C54,44 88,14 122,16 C156,16 188,42 178,106 Q174,84 166,110 Q164,78 152,96 Q150,66 138,90 Q134,58 122,92 Q112,58 106,90 Q96,64 90,96 Q80,78 76,110 Q70,84 62,106Z';
+
 function hairShapes(style) {
   switch (style) {
+    case 'flame': return { back: flameMane(), front: FLAME_FRONT };
     case 'spiky': return { back: 'M62,112 L42,100 L58,88 L38,72 L60,64 L46,44 L72,44 L66,20 L92,30 L96,6 L116,24 L130,2 L142,24 L162,8 L164,32 L188,24 L180,48 L202,52 L184,70 L204,84 L182,92 L196,108 L176,112 C176,60 160,40 120,40 C80,40 62,60 62,112Z', front: SPIKY_FRONT };
     case 'wild': return { back: 'M62,124 L34,114 L52,94 L26,76 L56,64 L42,36 L76,40 L82,8 L108,28 L124,0 L140,28 L166,8 L170,40 L202,36 L186,64 L216,76 L190,94 L208,114 L178,124 C178,60 160,40 120,40 C80,40 62,60 62,124Z', front: 'M62,108 C54,40 88,12 122,14 C156,14 188,40 178,108 L172,80 L170,116 L160,72 L154,100 L146,62 L134,104 L128,62 L118,102 L110,58 L100,98 L92,62 L82,104 L78,74 L70,116 L68,84Z' };
     case 'neat': return { back: BACK_CAP, front: 'M68,96 C62,46 90,24 120,24 C152,24 178,46 172,96 C168,76 160,64 150,60 C146,74 132,84 112,88 C122,80 128,72 130,62 C112,76 92,80 78,82 C74,86 70,90 68,96Z' };
@@ -68,6 +86,7 @@ const EYE_SHAPES = {
   sleepy: { white: 'M88,104 Q100,100 112,104 Q110,113 100,113 Q90,113 88,104Z', iris: [100.5, 108, 7.5, 9], lash: 'M87,104 Q100,99 113,104', lw: 3.2 },
   wide: { white: ellipsePath(100, 103, 12, 14), iris: [100.5, 104, 6, 7], lash: 'M86,99 Q100,86 114,98', lw: 3 },
   happy: { white: null, lash: 'M89,107 Q100,95 111,107', lw: 3.4 },
+  blaze: { white: ellipsePath(100, 104, 12, 12.5), iris: [100.5, 104.5, 10, 10.5], lash: 'M86,99 Q92,88 102,89 Q111,89 115,96', lw: 3.6 },
 };
 
 // Demon Slayer-style eye: ringed iris, dark upper lid shadow, heavy winged lash.
@@ -79,6 +98,19 @@ function eyeInner(style, gradId, clipId, color, fem) {
   if (!e.white) return `<path d="${e.lash}" fill="none" stroke="${INK}" stroke-width="${e.lw + 0.6}" stroke-linecap="round"/>`;
   const [cx, cy, rx, ry] = e.iris;
   const ring = shade(color, -0.55);
+  if (style === 'blaze') {
+    // Fire eyes: gold outer iris, a blazing red ring, gold core and a tiny pupil.
+    return `<path d="${e.white}" fill="#fffdf8"/>
+    <g clip-path="url(#${clipId})">
+      <circle cx="${cx}" cy="${cy}" r="${rx}" fill="#f7c63a" stroke="#b8501a" stroke-width="1.4"/>
+      <circle cx="${cx}" cy="${cy}" r="${rx * 0.72}" fill="${color}"/>
+      <circle cx="${cx}" cy="${cy}" r="${rx * 0.42}" fill="#ffd25a"/>
+      <circle cx="${cx}" cy="${cy}" r="${rx * 0.2}" fill="#2a0a0a"/>
+      <circle cx="${cx - rx * 0.4}" cy="${cy - ry * 0.42}" r="2.2" fill="#fff"/>
+    </g>
+    <path d="${e.lash}" fill="none" stroke="${INK}" stroke-width="${e.lw + 2}" stroke-linecap="round"/>
+    <path d="M86,99 L80,93 M87,102 L81,100" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
+  }
   return `<path d="${e.white}" fill="#fffdf8"/>
     <g clip-path="url(#${clipId})">
       <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#${gradId})" stroke="${ring}" stroke-width="1.4"/>
@@ -99,6 +131,7 @@ const BROWS = {
   angry: ['M87,82 Q100,84 112,90', 4], thin: ['M89,87 Q100,83 110,86', 1.8],
 };
 function brow(style, color) {
+  if (style === 'forked') return `<path d="M113,88 Q100,79 86,81 L78,72 L88,78 L82,68 Q99,74 113,84Z" fill="#24140e"/>`;
   if (style === 'dots') return `<ellipse cx="102" cy="84" rx="4.5" ry="3" fill="${color}"/>`;
   const [d, w] = BROWS[style] || BROWS.soft;
   return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round"/>`;
@@ -174,64 +207,214 @@ function mark(style, skin) {
     case 'vineMark': return `<path d="M152,90 Q160,100 153,110 Q146,119 155,128" fill="none" stroke="#e05a8a" stroke-width="2"/><ellipse cx="157" cy="101" rx="3.5" ry="1.8" fill="#e05a8a" transform="rotate(-30 157 101)"/><ellipse cx="149" cy="118" rx="3.5" ry="1.8" fill="#e05a8a" transform="rotate(30 149 118)"/>`;
     case 'moon': return `<path d="M144,112 a6.5,6.5 0 1,0 7,9 a5,5 0 1,1 -7,-9Z" fill="${c}"/>`;
     case 'star': return `<path d="M148,110 L149.6,114.4 L154,114.6 L150.6,117.4 L151.8,121.6 L148,119.2 L144.2,121.6 L145.4,117.4 L142,114.6 L146.4,114.4Z" fill="${c}"/>`;
-    case 'paint': return `<path d="M84,95 L92,88 L94,95Z" fill="#c0303a"/><path d="M83,104 L89,103 M84,111 L90,109 M88,118 L93,114" stroke="#c0303a" stroke-width="2.6" stroke-linecap="round"/>`;
+    case 'paint': {
+      // A red flower-burst of dots and rays around the left eye.
+      const rays = [[200, 22, 5], [225, 24, 4.5], [250, 22, 5], [275, 20, 4], [300, 22, 4.5], [170, 20, 4], [145, 18, 3.5]];
+      return `<g fill="#b8202e" stroke="#b8202e" stroke-width="2">${rays.map(([a, r, c]) => {
+        const t = (a * Math.PI) / 180, x = 98 + Math.cos(t) * r, y = 102 + Math.sin(t) * r;
+        return `<path d="M${98 + Math.cos(t) * 11},${102 + Math.sin(t) * 11} L${x.toFixed(1)},${y.toFixed(1)}" fill="none"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${c}" stroke="none"/>`;
+      }).join('')}</g>`;
+    }
     default: return '';
   }
 }
 
+// Masks share one shape (origin-centred, ~30x38). kind: fox | sun | flower | scar
+function maskShape(kind) {
+  const base = `<path d="M-12,-14 L-10,-27 L-2,-17Z M12,-14 L10,-27 L2,-17Z" fill="#f7f3ea" class="ol" stroke-width="1.5"/>
+    <path d="M-11,-16 L-10,-23 L-5,-17Z M11,-16 L10,-23 L5,-17Z" fill="${kind === 'flower' ? '#f0c23a' : '#d83a3a'}"/>
+    <path d="M-15,-6 Q-15,-20 0,-20 Q15,-20 15,-6 Q15,10 0,19 Q-15,10 -15,-6Z" fill="#f7f3ea" class="ol"/>`;
+  switch (kind) {
+    case 'sun': return base + `<circle cx="0" cy="-11" r="4" fill="#d83a3a"/>${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<circle cx="${(Math.cos((a * Math.PI) / 180) * 7).toFixed(1)}" cy="${(-11 + Math.sin((a * Math.PI) / 180) * 7).toFixed(1)}" r="1.2" fill="#d83a3a"/>`).join('')}
+      <path d="M-10,-2 L-3,-1 M10,-2 L3,-1" stroke="${INK}" stroke-width="1.8" stroke-linecap="round"/><path d="M-12,4 Q-8,6 -6,3 M12,4 Q8,6 6,3" fill="none" stroke="#d83a3a" stroke-width="1.6"/><circle cx="0" cy="12" r="1.8" fill="#d83a3a"/>`;
+    case 'flower': return base + `<path d="M-10,-1 Q-6,-5 -2,-1 M10,-1 Q6,-5 2,-1" fill="none" stroke="${INK}" stroke-width="1.6"/><path d="M-3,9 Q0,12 3,9" fill="none" stroke="#d83a3a" stroke-width="1.6"/>
+      ${[[9, -9, 4], [11, 3, 3.2], [3, -15, 2.6]].map(([x, y, r]) => `<g transform="translate(${x},${y})">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="${-r * 0.7}" rx="${r * 0.5}" ry="${r * 0.7}" fill="#4a8ae0" transform="rotate(${a})"/>`).join('')}<circle r="${r * 0.3}" fill="#f0e060"/></g>`).join('')}`;
+    case 'scar': return base + `<path d="M-11,-3 Q-6,-8 -2,-2 Q-6,1 -11,-3Z M11,-3 Q6,-8 2,-2 Q6,1 11,-3Z" fill="${INK}"/><path d="M-3,10 L3,10" stroke="${INK}" stroke-width="1.5"/><path d="M4,2 L12,10 M6,6 L9,4" stroke="#b8604a" stroke-width="1.4"/>`;
+    default: return base + `<path d="M-9,-3 Q-5,-8 -2,-3 M9,-3 Q5,-8 2,-3" fill="none" stroke="${INK}" stroke-width="1.6"/><path d="M-11,-8 Q-6,-14 -1,-9 M11,-8 Q6,-14 1,-9" fill="none" stroke="#c0303a" stroke-width="1.8"/><path d="M-5,9 Q0,13 5,9" fill="none" stroke="#c0303a" stroke-width="1.6"/>`;
+  }
+}
+// Headgear sits above hair and accessories (face-part coordinates).
+function headgear(kind, color) {
+  const dk = shade(color, -0.35);
+  switch (kind) {
+    case 'kasa': return accessory('strawHat');
+    case 'hachimaki': return `<path d="M66,74 Q120,58 174,74 L174,88 Q120,72 66,88Z" fill="${color}" class="ol" stroke-width="1.8"/>
+      <path d="M174,80 Q196,86 206,100 L196,104 Q190,94 176,88Z M174,84 Q190,100 190,118 L180,116 Q180,100 172,90Z" fill="${color}" class="ol" stroke-width="1.6"/><circle cx="176" cy="82" r="5" fill="${dk}" class="ol" stroke-width="1.4"/>`;
+    case 'jingasa': return `<path d="M96,70 L94,146 M144,70 L146,146" stroke="#c8a868" stroke-width="1.6"/>
+      <path d="M34,62 Q120,18 206,62 Q120,76 34,62Z" fill="#1e1a20" class="ol" stroke-width="2.2"/><path d="M60,56 Q120,32 180,56" fill="none" stroke="#4a4250" stroke-width="2"/>
+      <circle cx="120" cy="40" r="7" fill="#d9a83a" class="ol" stroke-width="1.4"/><circle cx="120" cy="40" r="3" fill="${color}"/>`;
+    case 'zukin': return `<path d="M58,112 C48,26 192,26 182,112 L184,150 L168,148 L168,104 C168,62 72,62 72,104 L72,148 L56,150Z" fill="${color}" class="ol"/>
+      <path d="M80,50 Q120,36 160,50 M64,98 Q66,74 78,62" fill="none" stroke="${dk}" stroke-width="1.8"/>`;
+    case 'tenugui': {
+      let dots = '';
+      for (let i = 0; i < 14; i++) dots += `<circle cx="${80 + ((i * 29) % 80)}" cy="${40 + ((i * 17) % 30)}" r="2" fill="#fff" opacity=".7"/>`;
+      return `<path d="M64,78 Q60,24 120,20 Q180,24 176,78 Q120,64 64,78Z" fill="${color}" class="ol"/>${dots}
+        <path d="M140,28 Q150,16 160,24 Q152,30 146,32Z M146,30 Q160,34 164,46 Q154,42 146,34Z" fill="${color}" class="ol" stroke-width="1.4"/>`;
+    }
+    default: return '';
+  }
+}
+const sideMask = (kind) => `<g transform="translate(160,50) rotate(24)">${maskShape(kind)}</g>`;
+
 function accessory(style, color) {
   switch (style) {
-    case 'foxMask': return `<g transform="translate(158,52) rotate(24)">
-      <path d="M-12,-14 L-9,-26 L-3,-16Z M12,-14 L9,-26 L3,-16Z" fill="#f7f3ea" class="ol" stroke-width="1.5"/>
-      <ellipse rx="15" ry="19" fill="#f7f3ea" class="ol"/>
-      <path d="M-9,-3 Q-5,-8 -2,-3 M9,-3 Q5,-8 2,-3" fill="none" stroke="${INK}" stroke-width="1.6"/>
-      <path d="M-11,-8 Q-6,-14 -1,-9 M11,-8 Q6,-14 1,-9" fill="none" stroke="#c0303a" stroke-width="1.8"/>
-      <path d="M-5,9 Q0,13 5,9" fill="none" stroke="#c0303a" stroke-width="1.6"/>
-      <path d="M-7,-15 q7,-6 14,0" fill="none" stroke="#3cb6c8" stroke-width="2"/></g>`;
+    case 'sunMask': return sideMask('sun');
+    case 'flowerMask': return sideMask('flower');
+    case 'scarMask': return `<path d="M70,74 Q120,58 170,74" fill="none" stroke="#a8202e" stroke-width="5"/><path d="M168,74 L176,98 M172,74 L182,94" stroke="#a8202e" stroke-width="3"/>` + sideMask('scar');
+    case 'maskFace': return `<g transform="translate(120,100) scale(2.9)">${maskShape('sun')}</g>`;
+    case 'bigButterfly': {
+      const wing = `<path d="M0,0 C-6,-22 -30,-28 -30,-10 C-30,0 -14,2 0,0Z" fill="url(#bfly)" class="ol" stroke-width="1.4"/><path d="M0,2 C-16,4 -24,18 -12,22 C-4,24 0,12 0,2Z" fill="url(#bfly)" class="ol" stroke-width="1.4"/>
+        <path d="M-2,-2 L-24,-14 M-4,-1 L-20,-4 M-2,3 L-14,14" stroke="${INK}" stroke-width="1"/><circle cx="-24" cy="-8" r="1.4" fill="#fff"/><circle cx="-26" cy="-14" r="1.2" fill="#fff"/>`;
+      return `<defs><linearGradient id="bfly" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, -0.45)}"/></linearGradient></defs>
+        <g transform="translate(156,46) rotate(14) scale(1.05)">${wing}<g transform="scale(-1,1)">${wing}</g><path d="M0,-6 L0,10" stroke="${INK}" stroke-width="2.4"/><path d="M0,-6 L-6,-16 M0,-6 L6,-16" stroke="${INK}" stroke-width="1"/></g>`;
+    }
+    case 'foxMask': return sideMask('fox');
+    case 'strawHat': {
+      let weave = '';
+      for (let i = -5; i <= 5; i++) weave += `M120,10 L${120 + i * 17},${76 - Math.abs(i) * 1.5} `;
+      return `<path d="M96,72 L92,148 M144,72 L148,148" stroke="#b89a5a" stroke-width="1.6"/>
+        <path d="M30,78 Q120,-6 210,78 Q120,92 30,78Z" fill="#cdb27a" class="ol" stroke-width="2.4"/><path d="${weave}" stroke="#9a7e46" stroke-width="1.2" opacity=".8"/>
+        <path d="M44,74 Q120,62 196,74" fill="none" stroke="#9a7e46" stroke-width="1.4"/><path d="M120,40 Q170,52 196,74 L206,80 Q170,86 150,84Z" fill="#000" opacity=".12"/>`;
+    }
     case 'ribbon': return `<g transform="translate(150,40) rotate(15)"><path d="M0,0 L-19,-11 L-18,11Z M0,0 L19,-11 L18,11Z" fill="${color}" class="ol" stroke-width="1.6"/><path d="M-2,2 L-8,22 M2,2 L8,22" stroke="${color}" stroke-width="4" stroke-linecap="round"/><circle r="4.5" fill="${shade(color, -0.2)}" class="ol" stroke-width="1.4"/></g>`;
     case 'butterfly': {
       const b = `<path d="M0,0 L-12,-10 Q-16,0 -6,2 L-10,10 Q-2,10 0,0 L10,10 Q2,10 0,0 L12,-10 Q16,0 6,2Z" fill="${color}" class="ol" stroke-width="1.2"/><path d="M0,-5 L0,6" stroke="${INK}" stroke-width="1.6"/>`;
       return `<g transform="translate(154,54) rotate(18)">${b}</g><g transform="translate(86,54) rotate(-18) scale(.8)">${b}</g>`;
     }
-    case 'headband': return `<path d="M70,72 Q120,54 170,72 L170,80 Q120,62 70,80Z" fill="#d6d9e0" class="ol" stroke-width="1.6"/>${[86, 103, 120, 137, 154].map((x, i) => `<path d="M${x},${71 - (i === 2 ? 4 : i % 2 ? 2 : 0)} l3.5,4 l-3.5,4 l-3.5,-4Z" fill="${color}" stroke="#fff" stroke-width=".8"/>`).join('')}`;
+    case 'headband': {
+      const beads = (x) => Array.from({ length: 9 }, (_, i) => `<circle cx="${x + Math.sin(i * 0.8) * 1.5}" cy="${84 + i * 7}" r="3" fill="#e8ecf4" class="ol" stroke-width="1"/>`).join('');
+      return `${beads(68)}${beads(172)}<path d="M64,66 Q120,46 176,66 L176,84 Q120,64 64,84Z" fill="#d6d9e0" class="ol" stroke-width="1.8"/>
+        ${[[94, 66, 7], [120, 60, 9], [146, 66, 7], [78, 72, 4.5], [162, 72, 4.5]].map(([x, y, r]) => `<path d="M${x},${y - r} L${x + r * 0.9},${y} L${x},${y + r} L${x - r * 0.9},${y}Z" fill="${color}" class="ol" stroke-width="1.2"/><path d="M${x - r * 0.4},${y - r * 0.3} L${x},${y - r * 0.7}" stroke="#fff" stroke-width="1.2"/>`).join('')}`;
+    }
     case 'flower': return `<g transform="translate(84,52)">${[0, 72, 144, 216, 288].map(a => `<ellipse cx="0" cy="-7" rx="5" ry="7" fill="${color}" class="ol" stroke-width="1.2" transform="rotate(${a})"/>`).join('')}<circle r="3.6" fill="#f0c23a"/></g>`;
     default: return '';
   }
 }
 
 /* ---------------- species heads ---------------- */
-// Muscle Mouse: round ears, buck teeth, whiskers. Boar: a fur boar-head mask with tusks.
-function mouseHead(fur) {
-  const light = shade(fur, 0.35), dark = shade(fur, -0.25);
-  return `<circle cx="76" cy="52" r="27" fill="${fur}" class="ol"/><circle cx="76" cy="52" r="16" fill="#f4a6b8"/>
-    <circle cx="164" cy="52" r="27" fill="${fur}" class="ol"/><circle cx="164" cy="52" r="16" fill="#f4a6b8"/>
-    <ellipse cx="120" cy="98" rx="45" ry="48" fill="${fur}" class="ol"/>
-    <path d="M150,62 Q172,100 146,140 L170,140 L170,62Z" fill="#000" opacity=".12"/>
-    <path d="M104,52 L110,66 L116,50 L122,66 L128,52" fill="none" stroke="${dark}" stroke-width="2"/>
-    <ellipse cx="120" cy="124" rx="24" ry="17" fill="${light}" class="ol"/>
-    <ellipse cx="100" cy="94" rx="7" ry="9.5" fill="#120a0e"/><ellipse cx="140" cy="94" rx="7" ry="9.5" fill="#120a0e"/>
-    <circle cx="98" cy="90" r="2.8" fill="#fff"/><circle cx="138" cy="90" r="2.8" fill="#fff"/>
-    <path d="M88,80 L110,84 M152,80 L130,84" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
-    <ellipse cx="120" cy="113" rx="7" ry="5" fill="#ff7a9a" class="ol" stroke-width="1.5"/>
-    <path d="M112,124 Q116,128 120,124 Q124,128 128,124" fill="none" stroke="${INK}" stroke-width="2"/>
-    <rect x="114" y="126" width="12" height="10" rx="2" fill="#fff" class="ol" stroke-width="1.4"/><path d="M120,126 L120,136" stroke="${INK}" stroke-width="1.2"/>
-    <path d="M96,120 L66,114 M96,126 L64,128 M144,120 L174,114 M144,126 L176,128" stroke="${INK}" stroke-width="1.4" opacity=".7"/>`;
+// Boar: a shaggy grey boar-head mask with pink-tipped ears, big blue eyes, pink snout and tusks.
+function boarHead(fur, p) {
+  const beard = shade(fur, -0.32), cx = 120, cy = 96;
+  let d = '';
+  for (let i = 0; i <= 48; i++) {
+    const t = (i / 48) * Math.PI * 2, low = Math.sin(t) > -0.2;
+    const sp = i % 2 ? (low ? 11 : 5) : 0;
+    d += `${i ? 'L' : 'M'}${(cx + Math.cos(t) * (52 + sp)).toFixed(1)},${(cy + Math.sin(t) * (54 + sp) * (Math.sin(t) > 0 ? 1.12 : 1)).toFixed(1)} `;
+  }
+  let jag = 'M50,124';
+  for (let x = 50; x <= 190; x += 10) jag += ` L${x + 5},${116 + ((x * 3) % 8)} L${x + 10},126`;
+  let strokes = '';
+  for (let i = 0; i < 22; i++) { const x = 78 + ((i * 37) % 84), y = 54 + ((i * 23) % 40); strokes += `M${x},${y} l${(i % 3) - 1},5 `; }
+  const ear = `<path d="M86,58 L72,22 L106,46Z" fill="#7a6e8e" class="ol"/><path d="M84,50 L76,30 L98,44Z" fill="#e8869e"/>`;
+  const eye = `<path d="M82,98 Q98,80 116,96 Q100,114 82,98Z" fill="#14101c"/><circle cx="99" cy="97" r="9.5" fill="#3462cc"/><circle cx="99" cy="97" r="6" fill="#6f9cf2"/><circle cx="99" cy="97" r="2.8" fill="#0c1230"/><circle cx="95.5" cy="93.5" r="2.6" fill="#fff"/>
+    <path d="M80,88 Q96,76 114,84 M84,108 Q98,114 110,108" fill="none" stroke="${beard}" stroke-width="1.6"/>`;
+  return `<defs><clipPath id="${p}bh"><path d="${d}Z"/></clipPath></defs>
+    ${ear}${mirror(ear)}
+    <path d="${d}Z" fill="${fur}" class="ol"/>
+    <g clip-path="url(#${p}bh)"><path d="${jag} L190,190 L50,190Z" fill="${beard}"/><path d="M152,40 Q186,100 150,170 L190,170 L190,40Z" fill="#000" opacity=".14"/></g>
+    <path d="${strokes}" stroke="${beard}" stroke-width="1.2" opacity=".8"/>
+    ${eye}${mirror(eye)}
+    <path d="M100,120 Q120,110 140,120 L148,142 Q120,156 92,142Z" fill="#e07a98" class="ol"/>
+    <path d="M104,122 Q120,116 136,122" fill="none" stroke="#f6aac0" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="110" cy="140" rx="4.5" ry="3.2" fill="#6a1e38"/><ellipse cx="130" cy="140" rx="4.5" ry="3.2" fill="#6a1e38"/>
+    <path d="M94,142 Q88,132 93,121 Q98,132 101,140Z M146,142 Q152,132 147,121 Q142,132 139,140Z" fill="#fffaf0" class="ol" stroke-width="1.4"/>`;
 }
-function boarHead(fur, hairColor) {
-  const dark = shade(fur, -0.35);
-  let mane = '';
-  for (let i = 0; i < 9; i++) { const x = 84 + i * 9; mane += `M${x},${54 - (i % 2) * 2} L${x + 4},${34 - (i % 3) * 5} L${x + 8},${54 - (i % 2) * 2} `; }
-  return `<path d="M64,100 L46,150 L70,132 L62,170 L88,140 L120,150 L152,140 L178,170 L170,132 L194,150 L176,100Z" fill="${hairColor}" class="ol"/>
-    <path d="M78,62 L66,30 L96,52Z M162,62 L174,30 L144,52Z" fill="${fur}" class="ol"/><path d="M78,56 L72,40 L88,52Z M162,56 L168,40 L152,52Z" fill="#c88a80"/>
-    <path d="${mane}" fill="${dark}" class="ol" stroke-width="1.5"/>
-    <path d="M70,92 C66,48 98,40 120,40 C142,40 174,48 170,92 C170,124 152,146 120,148 C88,146 70,124 70,92Z" fill="${fur}" class="ol"/>
-    <path d="M150,58 Q176,100 148,144 L172,140 L172,58Z" fill="#000" opacity=".14"/>
-    <path d="M84,70 Q96,62 108,70 M132,70 Q144,62 156,70" fill="none" stroke="${dark}" stroke-width="2.5"/>
-    <ellipse cx="100" cy="92" rx="10" ry="8" fill="#14101a" class="ol" stroke-width="1.5"/><ellipse cx="140" cy="92" rx="10" ry="8" fill="#14101a" class="ol" stroke-width="1.5"/>
-    <circle cx="102" cy="90" r="3.2" fill="#7ad0ff"/><circle cx="142" cy="90" r="3.2" fill="#7ad0ff"/>
-    <ellipse cx="120" cy="124" rx="24" ry="17" fill="#d8a098" class="ol"/>
-    <ellipse cx="112" cy="124" rx="4" ry="6" fill="#5a2a2a"/><ellipse cx="128" cy="124" rx="4" ry="6" fill="#5a2a2a"/>
-    <path d="M96,132 Q88,124 90,110 Q96,124 102,128Z M144,132 Q152,124 150,110 Q144,124 138,128Z" fill="#fffaf0" class="ol" stroke-width="1.4"/>`;
+
+// Swordsmith: a comic hyottoko mask, wild curly hair and a polka-dot headband with two knives.
+function smithHead(L) {
+  const hair = L.hairColor || '#1b1416';
+  let curls = '';
+  for (let i = 0; i < 22; i++) {
+    const a = ((150 + i * 11.5) * Math.PI) / 180, r = 58 + (i % 3) * 6;
+    curls += `<circle cx="${(120 + Math.cos(a) * r).toFixed(1)}" cy="${(98 + Math.sin(a) * r * 0.95).toFixed(1)}" r="${13 + (i % 4) * 2}" fill="${hair}" class="ol"/>`;
+  }
+  for (const [x, y] of [[58, 140], [182, 140], [64, 166], [176, 166]]) curls += `<circle cx="${x}" cy="${y}" r="14" fill="${hair}" class="ol"/>`;
+  const knife = (x) => `<path d="M${x - 4},76 L${x - 4},30 Q${x},18 ${x + 4},30 L${x + 4},76Z" fill="#dfe4ec" class="ol" stroke-width="1.6"/><path d="M${x + 1},30 L${x + 1},74" stroke="#fff" stroke-width="1.2"/>`;
+  let dots = '';
+  for (let x = 76; x <= 164; x += 11) dots += `<circle cx="${x}" cy="${74 - Math.sin(((x - 70) / 100) * Math.PI) * 7}" r="2.6" fill="${INK}"/>`;
+  return `${curls}${knife(104)}${knife(136)}
+    <ellipse cx="120" cy="102" rx="46" ry="50" fill="#f0dcc0" class="ol"/>
+    <path d="M150,66 Q172,104 146,148 L170,148 L170,66Z" fill="#000" opacity=".1"/>
+    <path d="M88,86 Q98,78 110,86 M130,86 Q142,78 152,86" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>
+    ${[100, 140].map((x) => `<circle cx="${x}" cy="100" r="8.5" fill="#fff" class="ol" stroke-width="2"/><circle cx="${x + 1}" cy="101" r="4.4" fill="${INK}"/>`).join('')}
+    <ellipse cx="94" cy="118" rx="7" ry="4" fill="#ff8a8a" opacity=".5"/><ellipse cx="146" cy="118" rx="7" ry="4" fill="#ff8a8a" opacity=".5"/>
+    <path d="M118,112 L114,122 L120,122" fill="none" stroke="${shade('#f0dcc0', -0.4)}" stroke-width="1.8"/>
+    <path d="M114,132 Q122,124 128,128" fill="none" stroke="${INK}" stroke-width="1.6"/>
+    <ellipse cx="132" cy="130" rx="8" ry="7" fill="#e8848a" class="ol" stroke-width="2"/><ellipse cx="134" cy="130" rx="3" ry="2.6" fill="#5a1e2a"/>
+    <path d="M68,72 Q120,56 172,72 L172,86 Q120,70 68,86Z" fill="#f7f4ee" class="ol" stroke-width="1.8"/>${dots}`;
+}
+
+// Muscle Mouse body (its own proportions: huge head and torso, thin legs, ragged fur shorts).
+function capsule(x1, y1, x2, y2, r1, r2, fill) {
+  const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len, f = (v) => v.toFixed(1);
+  return `<path d="M${f(x1 + nx * r1)},${f(y1 + ny * r1)} L${f(x2 + nx * r2)},${f(y2 + ny * r2)} L${f(x2 - nx * r2)},${f(y2 - ny * r2)} L${f(x1 - nx * r1)},${f(y1 - ny * r1)}Z" fill="${fill}"/><circle cx="${f(x1)}" cy="${f(y1)}" r="${r1}" fill="${fill}"/><circle cx="${f(x2)}" cy="${f(y2)}" r="${r2}" fill="${fill}"/>`;
+}
+
+export function renderMouse(L, opts = {}) {
+  const p = `ms${++uid}`;
+  const fur = L.furColor || '#c9c4d6', light = shade(fur, 0.4), dark = shade(fur, -0.38);
+  const gem = L.accColor || '#d8a6e8', shorts = L.shortsColor || '#3a2a4a', handC = '#5d5868';
+  const action = opts.pose === 'action';
+  const label = opts.name ? opts.name.replace(/[<>"&]/g, '') : 'Muscle Mouse';
+  const style = `<style>.ol{stroke:${INK};stroke-width:2;stroke-linejoin:round}.mo *{fill:${INK};stroke:${INK};stroke-width:7px;stroke-linejoin:round}</style>`;
+
+  const earsHead = `<circle cx="64" cy="62" r="34" fill="${fur}"/><circle cx="176" cy="62" r="34" fill="${fur}"/><ellipse cx="120" cy="114" rx="57" ry="55" fill="${fur}"/>`;
+  const face = `<circle cx="66" cy="64" r="21" fill="#f2a2b8"/><circle cx="174" cy="64" r="21" fill="#f2a2b8"/>
+    <path d="M60,58 Q66,48 76,52" fill="none" stroke="#d8809a" stroke-width="3"/><path d="M180,58 Q174,48 164,52" fill="none" stroke="#d8809a" stroke-width="3"/>
+    <g clip-path="url(#${p}hc)"><path d="M150,70 Q186,112 152,168 L186,168 L186,70Z" fill="#000" opacity=".14"/></g>
+    <path d="M100,136 Q120,198 140,136 Q120,148 100,136Z" fill="${light}" class="ol" stroke-width="1.8"/>
+    <ellipse cx="120" cy="184" rx="5.5" ry="4" fill="#2a2030"/>
+    <path d="M113,176 L82,168 M113,180 L84,184 M127,176 L158,168 M127,180 L156,184" stroke="${INK}" stroke-width="1.3" opacity=".8"/>
+    ${[98, 142].map((x) => `<circle cx="${x}" cy="128" r="16" fill="#1a1420" class="ol" stroke-width="1.6"/><circle cx="${x}" cy="128" r="11.5" fill="none" stroke="#6e6880" stroke-width="1.6"/><circle cx="${x - 6}" cy="121" r="4.2" fill="#fff"/><circle cx="${x + 5}" cy="134" r="1.8" fill="#fff"/>`).join('')}
+    <path d="M64,98 Q120,74 176,98 L174,116 Q120,92 66,116Z" fill="#efe4c4" class="ol" stroke-width="2"/>
+    <path d="M70,104 Q120,82 170,104" fill="none" stroke="#c8b890" stroke-width="1.4"/>
+    ${[[120, 95, 13, 9], [92, 102, 6, 6], [148, 102, 6, 6]].map(([x, y, w, h]) => `<path d="M${x - w},${y} L${x - w * 0.5},${y - h} L${x + w * 0.5},${y - h} L${x + w},${y} L${x + w * 0.5},${y + h} L${x - w * 0.5},${y + h}Z" fill="${gem}" class="ol" stroke-width="1.4"/><path d="M${x - w * 0.5},${y - h} L${x},${y} L${x + w * 0.5},${y - h} M${x - w},${y} L${x + w},${y}" stroke="#fff" stroke-width=".9" opacity=".8"/>`).join('')}
+    <g fill="#3a2a5a" class="ol" stroke-width="1.6"><ellipse cx="180" cy="102" rx="9" ry="6" transform="rotate(-30 180 102)"/><ellipse cx="182" cy="114" rx="9" ry="6" transform="rotate(30 182 114)"/><path d="M178,108 L194,128 L186,130Z M178,108 L198,118 L194,124Z"/></g>`;
+
+  if (opts.headOnly) {
+    return `<svg viewBox="26 22 188 188" class="avatar-svg" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${style}<defs><clipPath id="${p}hc"><ellipse cx="120" cy="114" rx="57" ry="55"/></clipPath></defs><g class="mo">${earsHead}</g>${earsHead}${face}</svg>`;
+  }
+
+  const arms = action
+    ? [[[66, 168], [28, 140], [36, 92]], [[174, 168], [204, 212], [180, 240]]]
+    : [[[66, 168], [44, 222], [50, 272]], [[174, 168], [196, 222], [190, 272]]];
+  const handPt = ([, e, w]) => { const dx = w[0] - e[0], dy = w[1] - e[1], l = Math.hypot(dx, dy); return [w[0] + (dx / l) * 9, w[1] + (dy / l) * 9]; };
+  const armShape = ([sh, e, w]) => {
+    const mx = (sh[0] + e[0]) / 2, my = (sh[1] + e[1]) / 2, out = mx < 120 ? -6 : 6;
+    return capsule(sh[0], sh[1], e[0], e[1], 22, 15, fur) + `<circle cx="${mx + out}" cy="${my}" r="20" fill="${fur}"/>` + capsule(e[0], e[1], w[0], w[1], 15, 10, fur);
+  };
+  const torso = `<path d="M52,178 Q54,146 92,142 L148,142 Q186,146 188,178 L176,216 Q164,244 154,262 L86,262 Q76,244 64,216Z" fill="${fur}"/>`;
+  const legs = capsule(104, 300, 100, 384, 10, 6, fur) + capsule(136, 300, 140, 384, 10, 6, fur) + `<ellipse cx="94" cy="390" rx="15" ry="6" fill="${fur}"/><ellipse cx="146" cy="390" rx="15" ry="6" fill="${fur}"/>`;
+  const hands = arms.map((a) => { const [x, y] = handPt(a); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="${handC}"/>`; }).join('');
+  const silhouette = legs + armShape(arms[0]) + armShape(arms[1]) + torso + earsHead;
+
+  const lines = `<g fill="none" stroke="${dark}" stroke-width="2" stroke-linecap="round">
+    <path d="M76,190 Q98,212 120,200 Q142,212 164,190"/><path d="M120,202 L120,254"/>
+    ${[214, 230, 246].map((y) => `<path d="M105,${y} Q112,${y + 4} 118,${y} M122,${y} Q128,${y + 4} 135,${y}"/>`).join('')}
+    <path d="M84,218 Q92,242 96,258 M156,218 Q148,242 144,258"/><path d="M62,190 Q72,168 92,164 M178,190 Q168,168 148,164"/></g>
+    <path d="M150,146 Q186,150 188,178 L176,216 Q164,244 154,262 L142,262 Q158,206 150,146Z" fill="#000" opacity=".14"/>`;
+
+  let hem = '';
+  for (let x = 170; x > 124; x -= 8) hem += ` L${x - 4},${336 + ((x * 3) % 7)} L${x - 8},${324}`;
+  let hem2 = '';
+  for (let x = 116; x > 70; x -= 8) hem2 += ` L${x - 4},${336 + ((x * 5) % 7)} L${x - 8},${324}`;
+  const shortsD = `M84,250 L156,250 Q166,286 172,326${hem} L124,322 L120,298 L116,322${hem2} L68,326 Q74,286 84,250Z`;
+  const shortsSvg = `<path d="${shortsD}" fill="${shorts}" class="ol"/><path d="M96,262 L92,300 M110,262 L108,292 M132,262 L134,292 M146,262 L150,300" stroke="${shade(shorts, 0.25)}" stroke-width="1.5"/><path d="M84,250 L156,250" stroke="${shade(shorts, -0.3)}" stroke-width="3"/>`;
+
+  const tail = `<path d="M150,262 Q222,272 206,332 Q196,372 228,398" fill="none" stroke="${INK}" stroke-width="9" stroke-linecap="round"/><path d="M150,262 Q222,272 206,332 Q196,372 228,398" fill="none" stroke="#e8b0bc" stroke-width="5" stroke-linecap="round"/>`;
+
+  let weapons = '';
+  if (opts.weapon) {
+    const [a, b] = heldPieces(opts.weapon, bladeColor(opts.weapon, opts.breathing), opts.name, opts.trainee);
+    const [lx, ly] = handPt(arms[0]), [rx, ry] = handPt(arms[1]);
+    if (a) weapons += `<g transform="translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${action ? 34 : -28}) translate(0,-14)">${a}</g>`;
+    if (b) weapons += `<g transform="translate(${rx.toFixed(1)},${ry.toFixed(1)}) rotate(28) translate(0,-14)">${b}</g>`;
+  }
+
+  return `<svg viewBox="0 -10 240 416" class="avatar-svg" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${style}
+    <defs><clipPath id="${p}hc"><ellipse cx="120" cy="114" rx="57" ry="55"/></clipPath></defs>
+    ${tail}<g class="mo">${silhouette}${hands}</g>${silhouette}${lines}${shortsSvg}${face}${weapons}<g class="mo" style="stroke-width:4px">${hands}</g>${hands}
+  </svg>`;
 }
 
 /* ---------------- haori patterns ---------------- */
@@ -242,7 +425,14 @@ function haoriDefs(p, style, c1, c2, hemY) {
     case 'triangles': return `<pattern id="${p}hp" width="16" height="14" patternUnits="userSpaceOnUse"><rect width="16" height="14" fill="${c1}"/><path d="M0,14 L8,0 L16,14Z" fill="${c2}"/></pattern>`;
     case 'waves': return `<pattern id="${p}hp" width="20" height="10" patternUnits="userSpaceOnUse"><rect width="20" height="10" fill="${c1}"/>${[10, 7, 4].map(r => `<path d="M${10 - r},10 A${r},${r} 0 0,1 ${10 + r},10" fill="none" stroke="${c2}" stroke-width="1.3"/>`).join('')}${[10, 7, 4].map(r => `<path d="M${-r},5 A${r},${r} 0 0,1 ${r},5 M${20 - r},5 A${r},${r} 0 0,1 ${20 + r},5" fill="none" stroke="${c2}" stroke-width="1.3"/>`).join('')}</pattern>`;
     case 'dots': return `<pattern id="${p}hp" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${c1}"/><circle cx="6" cy="6" r="2.5" fill="${c2}"/></pattern>`;
-    case 'butterfly': return `<linearGradient id="${p}hp" gradientUnits="userSpaceOnUse" x1="0" y1="115" x2="0" y2="${hemY}"><stop offset="0" stop-color="${shade(c1, 0.75)}"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;
+    case 'butterfly': return `<pattern id="${p}hp" width="34" height="40" patternUnits="userSpaceOnUse"><rect width="34" height="40" fill="${c1}"/><path d="M0,6 L12,10 L10,24 L0,28 M12,10 L26,2 L34,8 M10,24 L22,30 L34,26 M22,30 L20,40 M26,2 L24,0 M22,30 L28,16 L26,2" fill="none" stroke="#2a2430" stroke-width="1.1"/></pattern>`;
+    case 'clouds': return `<pattern id="${p}hp" width="56" height="48" patternUnits="userSpaceOnUse"><rect width="56" height="48" fill="${c1}"/>
+      <path d="M0,40 q7,-4 14,0 t14,0 t14,0 t14,0 M0,8 q7,-4 14,0 t14,0 t14,0 t14,0" fill="none" stroke="${shade(c1, -0.3)}" stroke-width="1.2"/>
+      <g fill="${c2}" stroke="${shade(c1, -0.45)}" stroke-width=".8"><circle cx="10" cy="22" r="5.5"/><circle cx="18" cy="17" r="7.5"/><circle cx="27" cy="22" r="5.5"/><rect x="9" y="22" width="19" height="5" rx="2.5"/>
+      <circle cx="40" cy="38" r="4"/><circle cx="46" cy="34" r="5.5"/><circle cx="52" cy="38" r="4"/><rect x="39" y="38" width="14" height="4" rx="2"/></g></pattern>`;
+    case 'blossoms': return `<pattern id="${p}hp" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="${c1}"/>
+      <g transform="translate(9,9)">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-4" rx="3" ry="4" fill="${c2}" transform="rotate(${a})"/>`).join('')}<circle r="1.6" fill="#f0c23a"/></g>
+      <circle cx="22" cy="22" r="2.2" fill="${c2}"/><circle cx="23" cy="6" r="1.4" fill="${c2}"/></pattern>`;
     default: return '';
   }
 }
@@ -255,11 +445,14 @@ function flameOverlay(hemY, c2) {
   }
   return `<path d="${d}" fill="${c2}"/><path d="M20,${hemY - 4} L220,${hemY - 4}" stroke="${shade(c2, 0.35)}" stroke-width="3" opacity=".6"/>`;
 }
-function wingOverlay(hemY) {
-  let d = '';
-  for (let x = 40; x < 210; x += 22) d += `M${x},${hemY} Q${x + 8},${hemY - 40} ${x + 2},${hemY - 75} `;
-  return `<path d="${d}" fill="none" stroke="#1d1530" stroke-width="1.6" opacity=".55"/>`;
+// Butterfly-wing bands at a hem: soft colour, pink, then a black border with white dots.
+function wingBands(y, c2) {
+  let dots = '';
+  for (let x = 0; x < 240; x += 9) dots += `<ellipse cx="${x + 4}" cy="${y - 6}" rx="2.6" ry="2" fill="#fff"/>`;
+  return `<rect x="0" y="${y - 46}" width="240" height="20" fill="${c2}" opacity=".92"/><rect x="0" y="${y - 26}" width="240" height="14" fill="#f28cab" opacity=".95"/>
+    <rect x="0" y="${y - 12}" width="240" height="14" fill="#16121c"/>${dots}`;
 }
+function wingOverlay(hemY, c2) { return wingBands(hemY, c2); }
 
 /* ---------------- weapons ---------------- */
 function guardSide(style, color) {
@@ -445,6 +638,7 @@ const CHIN_Y = 94;           // where the chin sits on the body
 const SHADE = 'fill="#000" opacity=".2"';
 
 export function renderAvatar(look, opts = {}) {
+  if (look.species === 'mouse') return renderMouse(look, opts);
   const p = `av${++uid}`;
   const L = look;
   const uc = L.uniformColor;
@@ -453,7 +647,8 @@ export function renderAvatar(look, opts = {}) {
   const hs = hairShapes(L.hair);
 
   /* shared defs */
-  let defs = `<linearGradient id="${p}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L.hairColor}"/><stop offset=".5" stop-color="${L.hairColor}"/><stop offset="1" stop-color="${L.hairTip || L.hairColor}"/></linearGradient>`;
+  const fade = { soft: ['.5', '1'], sharp: ['.7', '.76'], full: ['0', '1'], ends: ['.84', '.9'] }[L.hairFade] || ['.5', '1'];
+  let defs = `<linearGradient id="${p}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L.hairColor}"/><stop offset="${fade[0]}" stop-color="${L.hairColor}"/><stop offset="${fade[1]}" stop-color="${L.hairTip || L.hairColor}"/><stop offset="1" stop-color="${L.hairTip || L.hairColor}"/></linearGradient>`;
   for (const [id, c] of [['iris1', L.eyeColor], ['iris2', L.eyeColor2 || L.eyeColor]]) {
     defs += `<linearGradient id="${p}${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(c, -0.6)}"/><stop offset=".5" stop-color="${c}"/><stop offset="1" stop-color="${shade(c, 0.55)}"/></linearGradient>`;
   }
@@ -473,16 +668,18 @@ export function renderAvatar(look, opts = {}) {
   const fem = L.body === 'fem';
   const eyes = eye(L.eyes, `${p}iris1`, `${p}eclip`, L.eyeColor, fem) + mirror(eye(L.eyes, `${p}iris2`, `${p}eclip`, L.eyeColor2 || L.eyeColor, fem));
   const brows = `<g ${fem ? 'transform="translate(120 86) scale(1 .8) translate(-120 -86)"' : ''}>${brow(L.brows, browColor) + mirror(brow(L.brows, browColor))}</g>`;
-  const hairBack = `<path d="${hs.back}" fill="${hairFill}" class="ol"/><path d="${hs.back}" fill="#000" opacity=".28"/>`;
+  // Flame mane: the outer ring of locks takes the tip colour, like flickering fire.
+  if (L.hair === 'flame' && L.hairTip) defs += `<clipPath id="${p}ring"><path clip-rule="evenodd" d="M-200,-200 H440 V440 H-200Z ${ellipsePath(120, 92, 68, 68)}"/></clipPath>`;
+  const flameTips = L.hair === 'flame' && L.hairTip ? `<g clip-path="url(#${p}ring)"><path d="${hs.back}" fill="${L.hairTip}"/></g>` : '';
+  const hairBack = `<path d="${hs.back}" fill="${hairFill}" class="ol"/>${flameTips}<path d="${hs.back}" fill="#000" opacity=".22"/>`;
   const hairFront = `<path d="${hs.front}" fill="${hairFill}" class="ol"/>
     <g clip-path="url(#${p}hf)"><path d="${hs.front}" fill="#000" opacity=".26"/><path d="${hs.front}" transform="translate(-3,-7)" fill="${hairFill}"/>
     <path d="M98,26 Q90,50 100,76 M122,22 Q118,48 126,70 M146,28 Q156,52 148,80 M80,44 Q72,66 82,90 M164,46 Q172,70 162,94" fill="none" stroke="#000" stroke-width="1.6" opacity=".3"/>
     <path d="M86,44 Q120,28 154,44" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".3"/></g>`;
   const species = L.species || 'human';
-  const fur = L.furColor || '#bdb6c4';
-  const headFront = species === 'mouse' ? mouseHead(fur) + accessory(L.accessory, L.accColor)
-    : species === 'boar' ? boarHead(fur, L.hairColor)
-    : `${ears}${face}${blush}${eyes}${nose(L.nose, skin)}${mouth(L.mouth)}${hairFront}${brows}${scar(L.scar, skin)}${mark(L.mark, skin)}${earrings}${accessory(L.accessory, L.accColor)}`;
+  const headFront = species === 'boar' ? boarHead(L.furColor || '#9a948e', p)
+    : species === 'smith' ? smithHead(L) + earrings + headgear(L.headgear, L.headgearColor || '#c0303a')
+    : `${ears}${face}${blush}${eyes}${nose(L.nose, skin)}${mouth(L.mouth)}${hairFront}${brows}${scar(L.scar, skin)}${mark(L.mark, skin)}${earrings}${accessory(L.accessory, L.accColor)}${headgear(L.headgear, L.headgearColor || '#c0303a')}`;
   const style = `<style>.ol{stroke:${INK};stroke-width:2;stroke-linejoin:round}.hd .ol{stroke-width:3.2}</style>`;
   const label = opts.name ? opts.name.replace(/[<>"&]/g, '') : 'Your character';
 
@@ -491,7 +688,7 @@ export function renderAvatar(look, opts = {}) {
   }
 
   /* body */
-  const W = L.species && L.species !== 'human' ? 1.18 : { slim: 0.9, regular: 1, strong: 1.15 }[L.build] || 1;
+  const W = L.species === 'boar' ? 1.15 : { slim: 0.9, regular: 1, strong: 1.15 }[L.build] || 1;
   const femBody = L.body === 'fem' && L.species !== 'mouse';
   const S = 42 * W * (femBody ? 0.86 : 1), Wt = 27 * W * (femBody ? 0.86 : 1);
   const legLen = { short: 150, medium: 168, tall: 186 }[L.height] || 168;
@@ -506,18 +703,20 @@ export function renderAvatar(look, opts = {}) {
   let haoriBack = '', haoriFront = '', haoriSleeve = '', haoriSleeveD = '', haoriSleeveFill = '';
   if (hStyle !== 'none') {
     defs += haoriDefs(p, hStyle, c1, c2, hemY);
-    const patterned = ['checkered', 'hexagon', 'triangles', 'waves', 'dots', 'butterfly'].includes(hStyle);
+    const patterned = ['checkered', 'hexagon', 'triangles', 'waves', 'dots', 'butterfly', 'clouds', 'blossoms'].includes(hStyle);
     const fillA = patterned ? `url(#${p}hp)` : c1;
     const fillB = hStyle === 'split' ? c2 : fillA;
     const back = `M${120 - S - 4},118 L${120 + S + 4},118 L${120 + S + 18},${hemY} L${120 - S - 18},${hemY}Z`;
     const panel = `M110,106 L104,${hemY} L${120 - S - 16},${hemY} L${120 - S - 5},120 Q${120 - S + 2},111 110,106Z`;
     const sleeve = `M${ax + 8},111 Q${ax - 6},110 ${ax - 12},126 L${ax - 22},194 Q${ax - 6},202 ${ax + 12},196 L${ax + 8},140Z`;
     if (hStyle === 'split') defs += `<linearGradient id="${p}hs" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="0"><stop offset=".5" stop-color="${c1}"/><stop offset=".5" stop-color="${c2}"/></linearGradient>`;
-    const overlay = hStyle === 'flames' ? flameOverlay(hemY, c2) : hStyle === 'butterfly' ? wingOverlay(hemY) : '';
+    const overlay = hStyle === 'flames' ? flameOverlay(hemY, c2) : hStyle === 'butterfly' ? wingOverlay(hemY, c2) : '';
     defs += `<clipPath id="${p}cb"><path d="${back}"/></clipPath><clipPath id="${p}cf"><path d="${panel}"/><path d="${panel}" transform="matrix(-1 0 0 1 240 0)"/></clipPath>`;
     haoriBack = `<path d="${back}" fill="${hStyle === 'split' ? `url(#${p}hs)` : fillA}" class="ol"/>${overlay ? `<g clip-path="url(#${p}cb)">${overlay}</g>` : ''}<path d="${back}" ${SHADE}/>`;
     const side = (fill) => `<path d="${panel}" fill="${fill}" class="ol"/>`;
-    haoriSleeve = `<path d="${sleeve}" fill="${fillA}" class="ol"/>`;
+    const sleeveBands = hStyle === 'butterfly' ? `<g clip-path="url(#${p}cs)">${wingBands(204, c2)}</g>` : '';
+    defs += `<clipPath id="${p}cs"><path d="${sleeve}"/></clipPath>`;
+    haoriSleeve = `<path d="${sleeve}" fill="${fillA}" class="ol"/>${sleeveBands}`;
     haoriSleeveD = sleeve;
     haoriSleeveFill = fillA;
     const folds = `<path d="M${120 - S - 8},150 L${120 - S - 12},${hemY - 6} M${ax - 14},150 L${ax - 18},188" stroke="#000" stroke-width="1.6" opacity=".25" fill="none"/>`;
@@ -526,7 +725,7 @@ export function renderAvatar(look, opts = {}) {
   }
 
   /* legs, pants, shoes */
-  const pantsColor = L.uniform === 'training' || L.uniform === 'kimono' ? '#2a2f45' : shade(uc, 0.04);
+  const pantsColor = L.pantsColor || (L.uniform === 'training' || L.uniform === 'kimono' ? '#2a2f45' : shade(uc, 0.04));
   const pleat = shade(pantsColor, -0.4);
   let legs = '', legsL = '', legsR = '', legsTop = '';
   if (L.pants === 'hakama') {
@@ -539,18 +738,35 @@ export function renderAvatar(look, opts = {}) {
     legs = `<path d="${legD}" fill="${skin}" class="ol"/>${mirror(`<path d="${legD}" fill="${skin}" class="ol"/><path d="${legD}" ${SHADE}/>`)}
       <path d="M${120 - Wt - 2},200 L${120 + Wt + 2},200 L${120 + Wt + 12},${sy} L${120 - Wt - 12},${sy}Z" fill="${pantsColor}" class="ol"/>
       <path d="M108,204 L104,${sy - 2} M120,204 L120,${sy - 2} M132,204 L136,${sy - 2}" stroke="${pleat}" stroke-width="1.3"/>`;
+  } else if (L.pants === 'baggy') {
+    // Puffy trousers gathered at the shin, leg wraps below (or fur boots cover them).
+    const wy = fy - legLen * 0.3, wc = L.wrapColor || '#f2efe6';
+    let stripes = '';
+    for (let y = wy + 7; y < fy - 2; y += 8) stripes += `M106,${y} L117,${y - 4} `;
+    const legD = `M${120 - Wt - 1},200 L119,200 Q124,${wy - 40} 119,${wy + 2} L104,${wy + 2} Q${86 - Wt * 0.2},${wy - 60} ${120 - Wt - 1},200Z`;
+    const leg = `<path d="M105,${wy - 4} L118,${wy - 4} L117.5,${fy} L105,${fy}Z" fill="${wc}" class="ol" stroke-width="1.4"/><path d="${stripes}" stroke="${shade(wc, -0.3)}" stroke-width="1.2"/>
+      <path d="${legD}" fill="${pantsColor}" class="ol"/><path d="M108,${wy - 30} Q100,${wy - 60} 104,${wy - 90}" fill="none" stroke="${pleat}" stroke-width="1.4"/>`;
+    legsL = leg;
+    legsR = mirror(leg + `<path d="${legD}" fill="#000" opacity=".15"/>`);
   } else {
     const wy = fy - legLen * 0.42;
     let stripes = '';
     for (let y = wy + 8; y < fy - 2; y += 10) stripes += `M106,${y} L117,${y - 4} `;
     const legD = `M${120 - Wt},200 L119,200 L119,${wy + 4} L117.5,${fy} L105,${fy} L104,${wy + 4} Q${98 - Wt * 0.1},${wy - 30} ${120 - Wt - 2},200Z`;
     const leg = `<path d="${legD}" fill="${pantsColor}" class="ol"/>
-      <path d="M106,${wy} L117.8,${wy} L117.5,${fy} L105,${fy}Z" fill="#f2efe6" class="ol" stroke-width="1.4"/><path d="${stripes}" stroke="#b9b4a6" stroke-width="1.2"/>`;
+      <path d="M106,${wy} L117.8,${wy} L117.5,${fy} L105,${fy}Z" fill="${L.wrapColor || '#f2efe6'}" class="ol" stroke-width="1.4"/><path d="${stripes}" stroke="${shade(L.wrapColor || '#f2efe6', -0.3)}" stroke-width="1.2"/>`;
     legsL = leg;
     legsR = mirror(leg + `<path d="${legD}" fill="#000" opacity=".15"/>`);
   }
   let shoe;
-  if (L.shoes === 'boots') shoe = `<path d="M103,${fy - 26} L118,${fy - 26} L118,${fy + 5} L121,${fy + 9} L100,${fy + 9} L103,${fy + 1}Z" fill="#2a2a2e" class="ol"/>`;
+  if (L.shoes === 'geta') {
+    shoe = `<ellipse cx="111" cy="${fy + 2}" rx="8" ry="4" fill="${skin}" class="ol" stroke-width="1.4"/><rect x="100" y="${fy + 5}" width="22" height="5" rx="1" fill="#a8743f" class="ol" stroke-width="1.2"/>
+      <rect x="102" y="${fy + 10}" width="5" height="6" fill="#7a5028"/><rect x="115" y="${fy + 10}" width="5" height="6" fill="#7a5028"/><path d="M111,${fy - 1} L104,${fy + 5} M111,${fy - 1} L118,${fy + 5}" stroke="#a82a2a" stroke-width="2"/>`;
+  } else if (L.shoes === 'furBoots') {
+    let top = '';
+    for (let x = 101; x <= 119; x += 4) top += ` L${x + 2},${fy - 52 - ((x * 7) % 6)} L${x + 4},${fy - 44}`;
+    shoe = `<path d="M100,${fy - 44}${top} L121,${fy} L100,${fy}Z" fill="#23202e" class="ol"/><path d="M104,${fy - 30} l3,8 M112,${fy - 34} l2,9 M108,${fy - 16} l3,8" stroke="#4a4458" stroke-width="1.4"/><ellipse cx="111" cy="${fy + 4}" rx="9" ry="4.4" fill="${skin}" class="ol" stroke-width="1.4"/>`;
+  } else if (L.shoes === 'boots') shoe = `<path d="M103,${fy - 26} L118,${fy - 26} L118,${fy + 5} L121,${fy + 9} L100,${fy + 9} L103,${fy + 1}Z" fill="#2a2a2e" class="ol"/>`;
   else if (L.shoes === 'zori') shoe = `<ellipse cx="111" cy="${fy + 5}" rx="8" ry="4.2" fill="${skin}" class="ol" stroke-width="1.4"/><rect x="101" y="${fy + 7}" width="20" height="4" rx="2" fill="#c8a868" class="ol" stroke-width="1"/><path d="M111,${fy + 2} L105,${fy + 7} M111,${fy + 2} L117,${fy + 7}" stroke="#c0303a" stroke-width="1.8"/>`;
   else shoe = `<ellipse cx="111" cy="${fy + 5}" rx="8" ry="4.6" fill="#f2efe6" class="ol" stroke-width="1.4"/><rect x="101" y="${fy + 8}" width="20" height="3.5" rx="1.5" fill="#6b4a35"/>`;
   if (legsL) { legsL += shoe; legsR += mirror(shoe); } else legsTop = legs + shoe + mirror(shoe);
@@ -561,7 +777,10 @@ export function renderAvatar(look, opts = {}) {
   const lx = ax - 8 - (4 * (sl - 140)) / 68, rx = ax + 8 - (7 * (sl - 146)) / 62;
   const armSleeve = L.uniform === 'bare' ? `<path d="M${ax - 4},150 Q${ax - 10},160 ${ax - 9},172" fill="none" stroke="${shade(skin, -0.3)}" stroke-width="1.5"/>` : L.uniform === 'vest' ? `<path d="M${ax - 11.5},194 L${ax + 2.4},194 L${ax + 1},208 L${ax - 12},208Z" fill="#f2efe6" class="ol" stroke-width="1.2"/>`
     : `<path d="M${ax + 10},114 Q${ax - 6},114 ${ax - 8},140 L${lx},${sl} L${rx},${sl} L${ax + 8},146Z" fill="${uc}" class="ol"/>`;
-  const arm = `<path d="${armD}" fill="${skin}" class="ol"/>${armSleeve}`;
+  const bands = L.armbands === 'gold'
+    ? `<path d="M${ax - 9},136 L${ax + 9},140 L${ax + 8},154 L${ax - 10},151Z" fill="#e0b040" class="ol" stroke-width="1.4"/><path d="M${ax - 8},143 L${ax + 8},147" stroke="#a87a20" stroke-width="1.4"/>
+      <path d="M${ax - 12.4},190 L${ax + 2.6},190 L${ax + 1},207 L${ax - 12.4},207Z" fill="#4a3a7a" class="ol" stroke-width="1.4"/><path d="M${ax - 12},194 L${ax + 2},194 M${ax - 12},197 L${ax + 2},197" stroke="#e0b040" stroke-width="1.6"/>` : '';
+  const arm = `<path d="${armD}" fill="${skin}" class="ol"/>${armSleeve}${bands}`;
   const hx = ax - 6, hy = 214;
   const hand = `<circle cx="${hx}" cy="${hy}" r="6.5" fill="${skin}" class="ol"/>`;
 
@@ -594,6 +813,29 @@ export function renderAvatar(look, opts = {}) {
       torso += `<path d="M107,103 L133,103 L135,118 L105,118Z" fill="${dark}" class="ol" stroke-width="1.4"/><path d="M120,118 L120,194" stroke="${dark}" stroke-width="1.2"/>${buttons([132, 152, 172])}${belt}`;
   }
   torso += `<path d="M${120 + S * 0.3},108 L${120 + S - 16},112 Q${120 + S},114 ${120 + S - 6},122 L${120 + Wt + 2},206 L${120 + Wt * 0.3},206Z" ${SHADE}/>`;
+  const sc = L.scarfColor || '#4a7ad8', scD = shade(sc, -0.3);
+  const ribs = (x0, x1, y0, y1) => { let r = ''; for (let x = x0; x <= x1; x += 4.5) r += `M${x},${y0} L${x + 1},${y1} `; return `<path d="${r}" stroke="${scD}" stroke-width="1.2"/>`; };
+  let scarfFront = '', scarfBack = '';
+  if (L.scarf && L.scarf !== 'none') {
+    const high = L.scarf === 'wrap';
+    const top = high ? 88 : 96;
+    scarfFront = `<path d="M94,${top} Q120,${top + 8} 146,${top} L150,122 Q120,132 90,122Z" fill="${sc}" class="ol"/>${ribs(96, 144, top + 4, 124)}
+      <path d="M92,${top + 13} Q120,${top + 22} 148,${top + 13}" fill="none" stroke="${scD}" stroke-width="2.2"/>`;
+    if (L.scarf === 'knit') scarfFront += `<path d="M124,118 L142,116 L147,178 L129,180Z" fill="${sc}" class="ol"/>${ribs(127, 143, 120, 176)}<path d="M130,180 l-1,7 M134,180 l0,7 M138,179 l1,7 M142,179 l1,7 M146,178 l2,6" stroke="${sc}" stroke-width="2"/>`;
+    if (L.scarf === 'long') scarfBack = `<path d="M140,100 Q186,94 212,116 Q228,132 238,126 L236,144 Q214,152 198,136 Q180,118 146,120Z" fill="${sc}" class="ol"/><path d="M160,104 Q190,104 214,124" fill="none" stroke="${scD}" stroke-width="1.6"/>`;
+  }
+  let cape = '';
+  if (L.cape === 'mino') {
+    // Straw rain cape: two fringed tiers over the shoulders.
+    const tier = (y0, y1, w, c) => {
+      let d = `M${120 - w * 0.55},${y0} Q120,${y0 - 10} ${120 + w * 0.55},${y0} L${120 + w},${y1}`;
+      for (let x = 120 + w; x > 120 - w; x -= 7) d += ` L${x - 3.5},${y1 + 10 + ((x * 7) % 6)} L${x - 7},${y1}`;
+      let strands = '';
+      for (let x = 120 - w + 6; x < 120 + w; x += 6) strands += `M${120 + (x - 120) * 0.55},${y0 + 4} L${x},${y1 + 4} `;
+      return `<path d="${d}Z" fill="${c}" class="ol"/><path d="${strands}" stroke="${shade(c, -0.3)}" stroke-width="1.1"/>`;
+    };
+    cape = tier(110, 176, S + 30, '#a89060') + tier(104, 140, S + 16, '#bba070') + `<path d="M108,104 L104,116 M132,104 L136,116" stroke="#e8dcc0" stroke-width="2"/>`;
+  }
   const neck = `<rect x="112" y="80" width="16" height="32" fill="${skin}" class="ol"/><path d="M112,82 L128,82 L128,96 Q120,102 112,96Z" fill="${shade(skin, -0.2)}"/>`;
 
   /* weapon + pose */
@@ -616,17 +858,16 @@ export function renderAvatar(look, opts = {}) {
   }
   const wA = pieceA ? `<g transform="translate(${hx},${hy}) rotate(${action ? -62 : -28}) translate(0,-14)">${pieceA}</g>` : '';
   const wB = pieceB ? `<g transform="translate(${hx},${hy}) rotate(-28) translate(0,-14)">${pieceB}</g>` : '';
-  const sleeveR = haoriSleeveD ? `<path d="${haoriSleeveD}" fill="${hStyle === 'split' ? c2 : haoriSleeveFill}" class="ol"/><path d="${haoriSleeveD}" ${SHADE}/>` : '';
+  const sleeveR = haoriSleeveD ? (hStyle === 'split' ? `<path d="${haoriSleeveD}" fill="${c2}" class="ol"/>` : haoriSleeve) + `<path d="${haoriSleeveD}" ${SHADE}/>` : '';
   const armL = `<g transform="rotate(${aL} ${shL[0]} ${shL[1]})">${arm}${haoriSleeve}${wA}${hand}</g>`;
   const armRight = mirror(`<g transform="rotate(${aR} ${shL[0]} ${shL[1]})">${arm}<path d="${armD}" ${SHADE}/>${sleeveR}${wB}${hand}</g>`);
   const stance = (side) => (action ? `rotate(${side * 7} ${120 - side * 10} 204)` : '');
   const body = `<g transform="translate(0,${dy})">
     <g class="hd" transform="${headT}">${species === 'human' ? hairBack : ''}</g>
-    ${L.species === 'mouse' ? `<path d="M126,196 Q190,230 176,300 Q170,330 196,350" fill="none" stroke="#f4a6b8" stroke-width="6" stroke-linecap="round"/>` : ''}
     ${haoriBack}
     <g transform="${stance(1)}">${legsL}</g><g transform="${stance(-1)}">${legsR}</g>${legsTop}
-    ${neck}${torso}${haoriFront}
-    ${weaponExtra}${armL}${armRight}
+    ${scarfBack}${neck}${torso}${haoriFront}${scarfFront}
+    ${weaponExtra}${armL}${armRight}${cape}
     <g class="hd" transform="${headT}">${headFront}</g>
   </g>`;
 

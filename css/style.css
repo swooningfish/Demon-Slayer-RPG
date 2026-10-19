@@ -359,3 +359,9 @@ small { color: var(--muted); }
 .stage-weapon .manga-svg, .manga-reveal .manga-svg { border-radius: 10px; box-shadow: 0 6px 18px #0008; }
 .manga-reveal { transform: rotate(-2deg); margin: 6px 0 12px; }
 .in-row { display: flex; gap: 8px; align-items: center; } .in-row .icon-btn { height: 48px; width: 48px; }
+.logo-jp { color: var(--gold) !important; font-weight: 700; letter-spacing: .1em; }
+.logo-jp { font-size: 1.3rem; display: inline-flex; align-items: center; gap: 8px; }
+.say-btn { border: 1px solid var(--line); background: var(--card); border-radius: 999px; width: 36px; height: 36px; font-size: 1rem; }
+.logo .logo-say { margin-top: 4px; font-size: .92rem; }
+.logo-say b { color: var(--text); }
+.logo .logo-sub { font-style: italic; color: var(--accent); margin-top: 2px; }

@@ -11,20 +11,22 @@ const TABS = [
 
 // Each group: [title, lookKey, options | colours, { preview, none }]
 const GROUPS = {
-  face: [['Character', 'species', D.SPECIES, { preview: true }], ['Fur colour (Muscle Mouse & Boar)', 'furColor', D.FUR], ['Skin tone', 'skin', D.SKIN], ['Face shape', 'face', D.FACE, { preview: true }], ['Ears', 'ears', D.EARS, { preview: true }],
+  face: [['Character', 'species', D.SPECIES, { preview: true }], ['Fur colour (Mouse & Boar)', 'furColor', D.FUR], ['Skin tone', 'skin', D.SKIN], ['Face shape', 'face', D.FACE, { preview: true }], ['Ears', 'ears', D.EARS, { preview: true }],
     ['Nose', 'nose', D.NOSE, { preview: true }], ['Mouth', 'mouth', D.MOUTH, { preview: true }],
     ['Rosy cheeks', 'blush', [{ id: true, name: 'On' }, { id: false, name: 'Off' }]]],
   eyes: [['Eye shape', 'eyes', D.EYES, { preview: true }], ['Eye colour', 'eyeColor', D.EYE_COLORS],
     ['Right eye colour (odd eyes!)', 'eyeColor2', D.EYE_COLORS, { none: 'Same' }], ['Eyebrows', 'brows', D.BROWS, { preview: true }]],
   hair: [['Hairstyle', 'hair', D.HAIR, { preview: true }], ['Hair colour', 'hairColor', D.HAIR_COLORS],
-    ['Hair tips (two-tone)', 'hairTip', D.HAIR_COLORS, { none: 'None' }], ['Hair accessory', 'accessory', D.ACCESSORY, { preview: true }],
-    ['Accessory colour', 'accColor', D.CLOTH_COLORS]],
+    ['Hair tips (two-tone)', 'hairTip', D.HAIR_COLORS, { none: 'None' }], ['Tip style', 'hairFade', D.HAIR_FADE], ['Hair accessory', 'accessory', D.ACCESSORY, { preview: true }],
+    ['Accessory colour', 'accColor', D.CLOTH_COLORS], ['Headgear', 'headgear', D.HEADGEAR, { preview: true }], ['Headgear colour', 'headgearColor', D.CLOTH_COLORS]],
   marks: [['Scars', 'scar', D.SCARS, { preview: true }], ['Birthmarks & Slayer Marks', 'mark', D.MARKS, { preview: true }],
     ['Earrings', 'earrings', D.EARRINGS, { preview: true }], ['Earring colour', 'earringColor', D.METAL_COLORS]],
   body: [['Body style', 'body', D.BODY], ['Build', 'build', D.BUILD], ['Height', 'height', D.HEIGHT], ['Skin tone', 'skin', D.SKIN]],
   outfit: [['Top', 'uniform', D.UNIFORM], ['Top colour', 'uniformColor', D.CLOTH_COLORS], ['Bottoms', 'pants', D.PANTS],
     ['Shoes', 'shoes', D.SHOES], ['Haori (jacket)', 'haori', D.HAORI], ['Haori colour', 'haoriColor', D.CLOTH_COLORS],
-    ['Haori pattern colour', 'haoriColor2', D.CLOTH_COLORS]],
+    ['Haori pattern colour', 'haoriColor2', D.CLOTH_COLORS], ['Trousers colour', 'pantsColor', D.CLOTH_COLORS, { none: 'Auto' }],
+    ['Leg wrap colour', 'wrapColor', D.CLOTH_COLORS], ['Scarf', 'scarf', D.SCARF], ['Scarf colour', 'scarfColor', D.CLOTH_COLORS],
+    ['Straw cape', 'cape', D.CAPE], ['Arm bands', 'armbands', D.ARMBANDS], ['Fur shorts (Muscle Mouse)', 'shortsColor', D.CLOTH_COLORS]],
 };
 
 const isColorList = (opts) => typeof opts[0] === 'string';
@@ -50,7 +52,7 @@ export function randomLook() {
   L.mark = Math.random() < 0.35 ? L.mark : 'none';
   L.accessory = Math.random() < 0.4 ? L.accessory : 'none';
   L.skin = pickR(D.SKIN.slice(0, 7));
-  L.species = 'human';
+  Object.assign(L, { species: 'human', pantsColor: '', cape: 'none', armbands: 'none', scarf: Math.random() < 0.2 ? 'knit' : 'none', accessory: ['maskFace', 'strawHat'].includes(L.accessory) ? 'none' : L.accessory, headgear: 'none' });
   L.body = pickR(['masc', 'fem']);
   return L;
 }
@@ -128,7 +130,7 @@ export function creatorScreen(root, params) {
   function libraryPanel() {
     return `<p class="hint">Tap an outfit to wear it. You can still change every colour afterwards in Outfit.</p>
       <div class="library">${D.OUTFIT_PRESETS.map((p, i) => `
-        <button class="lib-card" data-preset="${i}">${renderAvatar({ ...look, ...p.set })}<b>${p.name}</b><small>${p.note}</small></button>`).join('')}</div>`;
+        <button class="lib-card" data-preset="${i}">${renderAvatar({ ...look, species: 'human', ...p.set }, { weapon: p.weapon ? { ...weapon, ...p.weapon } : null })}<b>${p.name}</b><small>${p.note}</small></button>`).join('')}</div>`;
   }
 
   function namePanel() {
@@ -177,15 +179,21 @@ export function creatorScreen(root, params) {
       if (v === 'true' || v === 'false') v = v === 'true';
       look[t.dataset.k] = v;
       // Picking a mouse or boar sets up a fitting outfit (still changeable).
-      if (t.dataset.k === 'species' && v === 'mouse') Object.assign(look, { uniform: 'bare', haori: 'none', accessory: 'headband', accColor: '#e05a8a', build: 'strong' });
-      if (t.dataset.k === 'species' && v === 'boar') Object.assign(look, { uniform: 'bare', haori: 'none', pants: 'hakama', hairColor: '#1f2a4a', furColor: '#8a7a6a' });
+      if (t.dataset.k === 'species' && v === 'mouse') Object.assign(look, { accColor: '#d8a6e8', furColor: '#c9c4d6' });
+      if (t.dataset.k === 'species' && v === 'boar') Object.assign(look, { uniform: 'bare', haori: 'none', pants: 'baggy', pantsColor: '#26304a', shoes: 'furBoots', furColor: '#9a948e' });
+      if (t.dataset.k === 'species' && v === 'smith') Object.assign(look, { uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'none', pants: 'hakama', pantsColor: '#b8ac90', shoes: 'geta', hairColor: '#1b1416' });
       if (t.dataset.k === 'species' && v === 'human' && look.uniform === 'bare') Object.assign(look, { uniform: 'corps' });
       redraw();
       return;
     }
     if (t.dataset.w) { weapon[t.dataset.w] = t.dataset.v; redraw(); return; }
     if (t.dataset.diff) { difficulty = t.dataset.diff; drawPanel(); return; }
-    if (t.dataset.preset) { Object.assign(look, D.OUTFIT_PRESETS[+t.dataset.preset].set); drawStage(); toast(`Wearing ${D.OUTFIT_PRESETS[+t.dataset.preset].name}`); return; }
+    if (t.dataset.preset) {
+      const pr = D.OUTFIT_PRESETS[+t.dataset.preset];
+      Object.assign(look, { species: 'human', ...pr.set });
+      if (pr.weapon) Object.assign(weapon, pr.weapon);
+      drawStage(); toast(`Wearing ${pr.name}${pr.weapon ? ' (weapon too)' : ''}`); return;
+    }
     switch (t.dataset.act) {
       case 'random': Object.assign(look, randomLook()); redraw(); break;
       case 'rname': name = randomName(look); drawPanel(); drawStage(); break;

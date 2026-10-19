@@ -16,6 +16,10 @@ export const SCENES = {
   cedar: { name: 'Giant cedar', sky: ['#060a12', '#14223a', '#24384a'], moon: '#f0f4ff', ground: '#121e14', tree: 'pine', fx: 'fireflies' },
   wisteria: { name: 'Wisteria Mountain', sky: ['#0e0820', '#2a1648', '#5a3a7a'], moon: '#fff0ff', ground: '#1e1430', tree: 'pine', fx: 'petals' },
   shrine: { name: 'Old shrine', sky: ['#14040a', '#3a0a18', '#6a1a24'], moon: '#ff5a4a', ground: '#1a1014', tree: 'dead', fx: 'embers' },
+  cabin: { name: 'Snowy cabin', sky: ['#0a0e1e', '#1e2a48', '#3a4a6a'], moon: '#f4f8ff', ground: '#dfe6f0', tree: 'snowpine', fx: 'snow' },
+  interior: { name: 'Home', indoor: true, fx: 'embers' },
+  temple: { name: 'Forest temple', sky: ['#080c16', '#18243a', '#2e3e52'], moon: '#fffbe8', ground: '#1c2420', tree: 'pine', fx: 'fireflies' },
+  street: { name: 'Town street', sky: ['#0a0c18', '#1e2440', '#40486a'], moon: '#fff4d0', ground: '#c8d0dc', tree: 'none', fx: 'snow' },
   dojo: { name: 'Training yard', sky: ['#0a0c18', '#1c2240', '#3a3a5a'], moon: '#fff4d0', ground: '#3a2c20', tree: 'pine', fx: 'leaves' },
 };
 
@@ -56,6 +60,7 @@ function mountains(y, peaks, amp, c, r) {
 }
 function treeRow(kind, y, count, hMin, hMax, c, r) {
   let s = '';
+  if (kind === 'none') return s;
   for (let i = 0; i < count; i++) {
     const x = (i + r() * 0.8) * (VW / count) - 10, h = hMin + r() * (hMax - hMin);
     s += kind === 'snowpine' ? snowPine(x, y, h, c) : kind === 'dead' ? deadTree(x, y, h, c, r) : kind === 'bamboo' ? bamboo(x, y, h, c, r) : pine(x, y, h, c);
@@ -64,6 +69,7 @@ function treeRow(kind, y, count, hMin, hMax, c, r) {
 }
 // Big foreground trees framing the left and right edges.
 function edgeTrees(kind, c, r) {
+  if (kind === 'none') return '';
   const one = (x) => {
     const h = 420 + r() * 80;
     return kind === 'snowpine' ? snowPine(x, VH + 30, h, c) : kind === 'dead' ? deadTree(x, VH, h, c, r) : kind === 'bamboo' ? bamboo(x, VH, h + 100, c, r) + bamboo(x + 26, VH, h + 60, c, r) : pine(x, VH + 30, h, c);
@@ -99,8 +105,91 @@ const torii = (x, y, w, h, c = '#c0303a') => `<g transform="translate(${x},${y})
   <path d="M${-w / 2 - 14},${-h - 8} Q0,${-h + 2} ${w / 2 + 14},${-h - 8} L${w / 2 + 10},${-h + 4} Q0,${-h + 12} ${-w / 2 - 10},${-h + 4}Z" fill="#1a0a0e"/>
   <rect x="-5" y="${-h + 4}" width="10" height="14" fill="${c}"/></g>`;
 
+// Taisho-era street: two rows of wooden shop-houses and telegraph poles running to a vanishing point.
+function street() {
+  const vx = 200, vy = 330;
+  const side = (dir, wall, trim) => {
+    const x0 = dir < 0 ? 0 : VW, xe = vx + dir * 18;
+    let g = `<path d="M${x0},150 L${xe},${vy - 30} L${xe},${vy + 6} L${x0},560Z" fill="${wall}"/>`;
+    for (let i = 0; i < 7; i++) {
+      const t = 1 - Math.pow(0.72, i + 1), x = x0 + (xe - x0) * t;
+      const top = 150 + (vy - 30 - 150) * t, bot = 560 + (vy + 6 - 560) * t;
+      g += `<path d="M${x.toFixed(1)},${top.toFixed(1)} L${x.toFixed(1)},${bot.toFixed(1)}" stroke="${trim}" stroke-width="${(4 * (1 - t) + 1).toFixed(1)}"/>`;
+      const wy = top + (bot - top) * 0.55;
+      g += `<rect x="${(dir < 0 ? x - (1 - t) * 40 : x + 4).toFixed(1)}" y="${wy.toFixed(1)}" width="${((1 - t) * 34 + 2).toFixed(1)}" height="${((bot - top) * 0.2).toFixed(1)}" fill="#ffb860" opacity=".55" class="flicker"/>`;
+      for (let k = 0; k < 6; k++) {
+        const lx = x + dir * -(k + 1) * (1 - t) * 6;
+        g += `<path d="M${lx.toFixed(1)},${(top + (bot - top) * 0.25).toFixed(1)} L${lx.toFixed(1)},${(top + (bot - top) * 0.45).toFixed(1)}" stroke="${trim}" stroke-width=".8" opacity=".7"/>`;
+      }
+    }
+    g += `<path d="M${x0},140 L${xe},${vy - 34}" stroke="#1a1418" stroke-width="10"/><path d="M${x0},${dir < 0 ? 300 : 290} L${xe},${vy - 12}" stroke="#2a2024" stroke-width="7"/>`;
+    return g;
+  };
+  let poles = '', wires = '';
+  const tops = [];
+  for (let i = 0; i < 6; i++) {
+    const t = 1 - Math.pow(0.66, i + 0.4), x = 350 + (vx + 26 - 350) * t, base = 600 + (vy - 600) * t, h = 330 * (1 - t) + 30, w = 2 + 8 * (1 - t);
+    tops.push([x, base - h]);
+    poles += `<rect x="${(x - w / 2).toFixed(1)}" y="${(base - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="#1a1418"/>`;
+    for (let k = 0; k < 3; k++) poles += `<rect x="${(x - w * 3).toFixed(1)}" y="${(base - h + 8 * (1 - t) + k * 12 * (1 - t) + 2).toFixed(1)}" width="${(w * 6).toFixed(1)}" height="${(w * 0.5).toFixed(1)}" fill="#1a1418"/>`;
+  }
+  for (let i = 0; i < tops.length - 1; i++) wires += `M${tops[i][0].toFixed(1)},${(tops[i][1] + 4).toFixed(1)} Q${((tops[i][0] + tops[i + 1][0]) / 2).toFixed(1)},${((tops[i][1] + tops[i + 1][1]) / 2 + 14).toFixed(1)} ${tops[i + 1][0].toFixed(1)},${(tops[i + 1][1] + 4).toFixed(1)} `;
+  return `<path d="M${vx - 26},${vy} L${vx + 26},${vy} L${VW},${VH} L0,${VH}Z" fill="#c8d0dc"/>
+    <path d="M${vx},${vy} L120,${VH} M${vx},${vy} L290,${VH}" stroke="#a8b2c2" stroke-width="2" opacity=".6"/>
+    ${side(-1, '#3a2e26', '#24191a')}${side(1, '#33292a', '#1e1618')}
+    <path d="${wires}" stroke="#1a1418" stroke-width="1.2" fill="none"/>${poles}
+    ${lantern(96, 520, 0.8)}`;
+}
+
+function interior() {
+  const vx = 200, vy = 290;
+  let planks = '', boards = '';
+  for (let i = -6; i <= 6; i++) planks += `M${vx + i * 16},380 L${vx + i * 64},${VH} `;
+  for (let i = 0; i < 8; i++) boards += `M${110 - i * 14},${210 - i * 26} L${110 - i * 14},${380 + i * 28} M${290 + i * 14},${210 - i * 26} L${290 + i * 14},${380 + i * 28} `;
+  let beams = '';
+  for (let i = 0; i < 4; i++) { const y = 40 + i * 50, k = i / 4; beams += `<path d="M${k * 110},${y} L${400 - k * 110},${y}" stroke="#2a1c12" stroke-width="${12 - i * 2}"/>`; }
+  return `<path d="M0,0 L400,0 L290,210 L110,210Z" fill="#3a2a1c"/>${beams}
+    <path d="M0,0 L110,210 L110,380 L0,560Z" fill="#5a4230"/><path d="M400,0 L290,210 L290,380 L400,560Z" fill="#4a3626"/>
+    <path d="${boards}" stroke="#2e2014" stroke-width="1.2" opacity=".7"/>
+    <rect x="110" y="210" width="180" height="170" fill="#4e3a28"/>
+    <rect x="128" y="236" width="70" height="144" fill="#6a5238" stroke="#2a1c12" stroke-width="4"/><rect x="202" y="236" width="70" height="144" fill="#6a5238" stroke="#2a1c12" stroke-width="4"/>
+    <path d="M30,140 L84,170 L84,280 L30,266Z" fill="#cfd8e8" opacity=".55"/><path d="M57,154 L57,272 M30,204 L84,226" stroke="#2a1c12" stroke-width="3"/>
+    <path d="M110,380 L290,380 L400,600 L0,600Z" fill="#6a4c30"/><path d="${planks}" stroke="#4a321e" stroke-width="1.4"/>
+    <ellipse cx="200" cy="476" rx="150" ry="70" fill="url(#glow)" class="flicker"/>
+    <path d="M150,450 L250,450 L272,506 L128,506Z" fill="#1a120c" stroke="#3a2a1c" stroke-width="5"/>
+    <ellipse cx="200" cy="482" rx="34" ry="10" fill="#ff8a3c" opacity=".8" class="flicker"/>
+    <path d="M200,0 L200,430" stroke="#1a120c" stroke-width="3"/><path d="M186,430 Q200,416 214,430 Q216,452 200,454 Q184,452 186,430Z" fill="#2a2a30" stroke="#0e0c10" stroke-width="2"/>
+    ${[[30, 420], [340, 400]].map(([x, y], i) => i ? `<path d="M${x},${y} L${x + 50},${y - 10} L${x + 50},${y + 90} L${x},${y + 100}Z" fill="#4a3220" stroke="#24180e" stroke-width="2"/><path d="M${x},${y + 30} L${x + 50},${y + 22} M${x},${y + 62} L${x + 50},${y + 56}" stroke="#24180e" stroke-width="2"/>`
+      : `<rect x="${x}" y="${y}" width="34" height="56" fill="#f6e2b8" stroke="#2a1c12" stroke-width="3" class="flicker"/><ellipse cx="${x + 17}" cy="${y + 28}" rx="50" ry="50" fill="url(#glow)" class="flicker"/>`).join('')}`;
+}
+
 function landmark(id, r) {
   switch (id) {
+    case 'street': return street();
+    case 'cabin': return `<g transform="translate(0,${GROUND})">
+      <path d="M70,-110 L250,-110 L250,0 L70,0Z" fill="#4a3a2c"/><path d="M70,-50 L250,-50" stroke="#2a1e16" stroke-width="3"/>
+      ${[100, 130, 160, 220].map((x) => `<path d="M${x},-110 L${x},0" stroke="#2a1e16" stroke-width="4"/>`).join('')}
+      <rect x="168" y="-92" width="44" height="80" fill="#ffb860" opacity=".7" class="flicker"/><path d="M190,-92 L190,-12" stroke="#2a1e16" stroke-width="3"/>
+      <path d="M44,-100 L96,-200 L224,-200 L276,-100Z" fill="#e2e8f2" stroke="#9aa6b8" stroke-width="2"/><path d="M44,-100 L276,-100" stroke="#6a5a48" stroke-width="7"/>
+      <rect x="112" y="-214" width="96" height="16" fill="#d8dee8" stroke="#9aa6b8" stroke-width="2"/>${[120, 140, 160, 180, 200].map((x) => `<rect x="${x - 3}" y="-220" width="6" height="8" fill="#9aa6b8"/>`).join('')}
+      <path d="M150,-200 L120,-120 M180,-200 L210,-120" stroke="#b8c2d2" stroke-width="2" opacity=".7"/>
+      <path d="M290,0 L338,-92 L392,0Z" fill="#3a3026"/><path d="M296,-12 L338,-92 L344,-80 L306,-10Z" fill="#e2e8f2"/>
+      <rect x="288" y="-40" width="108" height="40" fill="#6a4a30"/>${[300, 316, 332, 348, 364, 380].map((x) => `<path d="M${x},-40 L${x},0" stroke="#3a2618" stroke-width="2"/>`).join('')}
+      <path d="M326,0 L326,-22 Q338,-36 350,-22 L350,0Z" fill="#120c08"/>
+      <g transform="translate(272,-14)"><circle r="16" fill="none" stroke="#5a4028" stroke-width="4"/>${[0, 45, 90, 135].map((a) => `<path d="M${(16 * Math.cos((a * Math.PI) / 180)).toFixed(1)},${(16 * Math.sin((a * Math.PI) / 180)).toFixed(1)} L${(-16 * Math.cos((a * Math.PI) / 180)).toFixed(1)},${(-16 * Math.sin((a * Math.PI) / 180)).toFixed(1)}" stroke="#5a4028" stroke-width="2"/>`).join('')}</g>
+      <path d="M272,-14 L232,-40 M272,-8 L230,-32" stroke="#5a4028" stroke-width="4"/>
+      ${[[40, 6, 50], [140, 8, 70], [360, 6, 40]].map(([x, y, w]) => `<ellipse cx="${x}" cy="${y}" rx="${w}" ry="14" fill="#eef2f8"/>`).join('')}</g>`;
+    case 'temple': return `<g transform="translate(200,${GROUND})">
+      <path d="M-110,-40 L110,-40 L118,-20 L-118,-20Z" fill="#5a5a60"/><rect x="-118" y="-20" width="236" height="20" fill="#4a4a50"/>
+      <rect x="-80" y="-120" width="160" height="80" fill="#4a3424"/>${[-60, -30, 0, 30, 60].map((x) => `<path d="M${x},-120 L${x},-40" stroke="#2a1c12" stroke-width="3"/>`).join('')}
+      <rect x="-28" y="-104" width="56" height="64" fill="#2a1c12"/><path d="M-28,-88 L28,-88 M-28,-72 L28,-72 M-28,-56 L28,-56 M0,-104 L0,-40" stroke="#5a4430" stroke-width="2"/>
+      <path d="M-120,-112 Q0,-136 120,-112 L92,-160 Q0,-186 -92,-160Z" fill="#26262e" stroke="#14141a" stroke-width="2"/>
+      <path d="M-120,-112 Q-130,-108 -136,-116 M120,-112 Q130,-108 136,-116" stroke="#26262e" stroke-width="5" fill="none"/>
+      <rect x="-10" y="-186" width="20" height="16" fill="#26262e"/><ellipse cx="0" cy="-192" rx="6" ry="9" fill="#3a3a44"/>
+      <path d="M-90,-40 L-90,-56 L90,-56 L90,-40" fill="none" stroke="#3a2618" stroke-width="3"/>
+      ${[0, 1, 2, 3].map((i) => `<rect x="${-30 - i * 8}" y="${i * 8}" width="${60 + i * 16}" height="8" fill="${i % 2 ? '#6a6a72' : '#5a5a62'}"/>`).join('')}</g>
+      ${lantern(92, GROUND + 8)}${lantern(308, GROUND + 8)}
+      <path d="M0,${GROUND - 4} L120,${GROUND - 4} M280,${GROUND - 4} L400,${GROUND - 4}" stroke="#4a3a2a" stroke-width="5"/>`;
     case 'river': return `<path d="M0,${GROUND + 6} Q200,${GROUND - 14} ${VW},${GROUND + 2} L${VW},${GROUND + 40} Q200,${GROUND + 26} 0,${GROUND + 46}Z" fill="#9ec4e8"/>
       <path d="M40,${GROUND + 20} L120,${GROUND + 16} M200,${GROUND + 24} L300,${GROUND + 18}" stroke="#fff" stroke-width="2" opacity=".7"/>`;
     case 'mill': return `<g fill="#1a1216"><rect x="230" y="${GROUND - 150}" width="140" height="150"/><path d="M220,${GROUND - 150} L300,${GROUND - 210} L380,${GROUND - 150}Z"/></g>
@@ -145,6 +234,13 @@ function landmark(id, r) {
 
 export function renderScene(id = 'forest', seed = 7) {
   const sc = SCENES[id] || SCENES.forest;
+  if (sc.indoor) {
+    const r0 = rng(seed + 11);
+    return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMax slice" class="scene-svg" aria-hidden="true">
+      <defs><radialGradient id="glow"><stop offset="0" stop-color="#ffb860" stop-opacity=".55"/><stop offset="1" stop-color="#ffb860" stop-opacity="0"/></radialGradient>
+      <radialGradient id="vig" cx="50%" cy="55%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient></defs>
+      ${interior()}${particles(sc.fx, r0)}<rect width="${VW}" height="${VH}" fill="url(#vig)"/></svg>`;
+  }
   const r = rng(seed * 7919 + id.length * 104729);
   const [s0, s1, s2] = sc.sky;
   const red = id === 'shrine';

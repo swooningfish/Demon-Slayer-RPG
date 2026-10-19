@@ -76,7 +76,7 @@ export function exportSave(game) {
   const blob = new Blob([JSON.stringify(game, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `slayers-path-${(game.name || 'slayer').replace(/\W+/g, '_')}.json`;
+  a.download = `onigari-${(game.name || 'slayer').replace(/\W+/g, '_')}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }

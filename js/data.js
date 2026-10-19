@@ -13,9 +13,9 @@ const o = (id, name) => ({ id, name });
 
 export const FACE = [o('oval', 'Oval'), o('round', 'Round'), o('sharp', 'Sharp'), o('square', 'Square')];
 export const EYES = [o('round', 'Sparkly'), o('sharp', 'Sharp'), o('gentle', 'Gentle'), o('fierce', 'Fierce'),
-  o('sleepy', 'Sleepy'), o('happy', 'Happy'), o('wide', 'Wide')];
+  o('sleepy', 'Sleepy'), o('happy', 'Happy'), o('wide', 'Wide'), o('blaze', 'Fire eyes')];
 export const BROWS = [o('soft', 'Soft'), o('thick', 'Thick'), o('worried', 'Worried'), o('angry', 'Determined'),
-  o('dots', 'Dot brows'), o('thin', 'Thin')];
+  o('dots', 'Dot brows'), o('thin', 'Thin'), o('forked', 'Forked (fire)')];
 export const NOSE = [o('line', 'Line'), o('dot', 'Dot'), o('button', 'Button'), o('sharp', 'Pointed'), o('none', 'None')];
 export const MOUTH = [o('smile', 'Smile'), o('grin', 'Big grin'), o('fang', 'Fang smile'), o('cat', 'Cat smile'),
   o('neutral', 'Calm'), o('o', 'Surprised'), o('frown', 'Serious'), o('smirk', 'Smirk')];
@@ -26,43 +26,60 @@ export const SCARS = [o('none', 'None'), o('forehead', 'Forehead burn'), o('chee
   o('eye', 'Across eye'), o('cross', 'Cross scar'), o('nose', 'Nose bridge'), o('chin', 'Chin nick')];
 export const MARKS = [o('none', 'None'), o('beauty', 'Beauty mark'), o('freckles', 'Freckles'),
   o('flameMark', 'Slayer Mark: flame'), o('vineMark', 'Slayer Mark: vines'), o('moon', 'Moon birthmark'),
-  o('star', 'Star birthmark'), o('paint', 'Eye paint')];
+  o('star', 'Star birthmark'), o('paint', 'Flower eye paint')];
 export const HAIR = [o('spiky', 'Spiky'), o('wild', 'Wild mane'), o('neat', 'Side swept'), o('long', 'Long straight'),
-  o('ponytail', 'High ponytail'), o('side', 'Side ponytail'), o('braids', 'Twin braids'), o('bob', 'Bob'), o('bun', 'Bun')];
+  o('ponytail', 'High ponytail'), o('side', 'Side ponytail'), o('braids', 'Twin braids'), o('bob', 'Bob'), o('bun', 'Bun'), o('flame', 'Flame mane')];
+export const HAIR_FADE = [o('soft', 'Soft tips'), o('sharp', 'Sharp ends'), o('ends', 'Just the ends'), o('full', 'Full fade')];
 export const ACCESSORY = [o('none', 'None'), o('foxMask', 'Fox mask'), o('ribbon', 'Ribbon'), o('butterfly', 'Butterfly clips'),
-  o('headband', 'Jewel headband'), o('flower', 'Flower pin')];
-export const SPECIES = [o('human', 'Human'), o('mouse', 'Muscle Mouse'), o('boar', 'Boar Mask')];
+  o('bigButterfly', 'Big butterfly'), o('headband', 'Jewel headband'), o('flower', 'Flower pin'),
+  o('sunMask', 'Warding mask'), o('flowerMask', 'Flower cat mask'), o('scarMask', 'Scarred fox mask'), o('maskFace', 'Mask over face')];
+export const HEADGEAR = [o('none', 'None'), o('kasa', 'Straw hat (kasa)'), o('hachimaki', 'Hachimaki band'), o('jingasa', 'Jingasa hat'), o('zukin', 'Zukin hood'), o('tenugui', 'Tenugui cloth')];
+export const SPECIES = [o('human', 'Human'), o('mouse', 'Muscle Mouse'), o('boar', 'Boar Mask'), o('smith', 'Swordsmith Mask')];
 export const BODY = [o('masc', 'Masculine'), o('fem', 'Feminine')];
 export const FUR = ['#bdb6c4', '#e8e4ec', '#8a7a6a', '#6b4a35', '#4a4048', '#d8b48a'];
 export const BUILD = [o('slim', 'Slim'), o('regular', 'Regular'), o('strong', 'Strong')];
 export const HEIGHT = [o('short', 'Short'), o('medium', 'Medium'), o('tall', 'Tall')];
 export const UNIFORM = [o('corps', 'Corps uniform'), o('open', 'Open collar'), o('kimono', 'Kimono'),
   o('training', 'Training gi'), o('vest', 'Sleeveless'), o('bare', 'Bare chest + fur pelt')];
-export const PANTS = [o('hakama', 'Wide hakama'), o('fitted', 'Fitted + leg wraps'), o('skirt', 'Pleated skirt')];
-export const SHOES = [o('tabi', 'Tabi + sandals'), o('boots', 'Boots'), o('zori', 'Straw sandals')];
+export const PANTS = [o('hakama', 'Wide hakama'), o('baggy', 'Baggy + leg wraps'), o('fitted', 'Fitted + leg wraps'), o('skirt', 'Pleated skirt')];
+export const SHOES = [o('tabi', 'Tabi + sandals'), o('boots', 'Boots'), o('zori', 'Straw sandals'), o('geta', 'Geta'), o('furBoots', 'Fur boots')];
+export const SCARF = [o('none', 'None'), o('knit', 'Knitted scarf'), o('wrap', 'High wrap'), o('long', 'Long, flowing')];
+export const CAPE = [o('none', 'None'), o('mino', 'Straw cape')];
+export const ARMBANDS = [o('none', 'None'), o('gold', 'Gold bands + wrist guards')];
 export const HAORI = [o('none', 'No haori'), o('plain', 'Plain'), o('checkered', 'Checkered'), o('split', 'Two halves'),
   o('hexagon', 'Hexagon'), o('triangles', 'Triangles'), o('flames', 'Flame hem'), o('butterfly', 'Butterfly wings'),
-  o('waves', 'Waves'), o('dots', 'Polka dots')];
+  o('waves', 'Waves'), o('dots', 'Polka dots'), o('clouds', 'Clouds'), o('blossoms', 'Blossoms')];
 
 // Outfit library: one tap sets a whole look inspired by famous slayers.
 export const OUTFIT_PRESETS = [
-  { name: 'Water Checkered', note: 'Tanjiro style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'checkered', haoriColor: '#2f8f5b', haoriColor2: '#0f0f12', pants: 'fitted', shoes: 'tabi' } },
-  { name: 'Thunder Triangles', note: 'Zenitsu style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'triangles', haoriColor: '#e0b13a', haoriColor2: '#f2efe6', pants: 'fitted', shoes: 'tabi' } },
-  { name: 'Flame Hashira', note: 'Rengoku style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'flames', haoriColor: '#f2efe6', haoriColor2: '#d8452f', pants: 'hakama', shoes: 'boots' } },
-  { name: 'Butterfly', note: 'Shinobu style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'butterfly', haoriColor: '#9b6cd6', haoriColor2: '#6fc3e0', pants: 'fitted', shoes: 'boots' } },
+  { name: 'Water Checkered', note: 'Tanjiro style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'checkered', haoriColor: '#2f8f5b', haoriColor2: '#0f0f12', pants: 'baggy', wrapColor: '#f2efe6', shoes: 'zori', earrings: 'hanafuda', scar: 'forehead' } },
+  { name: 'Final Selection', note: 'Cloud kimono + warding mask', set: { uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'clouds', haoriColor: '#3f6fc8', haoriColor2: '#f4f4f8', pants: 'baggy', pantsColor: '#3a3a40', wrapColor: '#d8ccb0', shoes: 'zori', accessory: 'sunMask' } },
+  { name: 'Winter Scarf', note: 'Knitted scarf', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'checkered', haoriColor: '#2f8f5b', haoriColor2: '#0f0f12', scarf: 'wrap', scarfColor: '#4a7ad8' } },
+  { name: 'Straw Traveller', note: 'Straw hat + cape', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'checkered', haoriColor: '#2f8f5b', haoriColor2: '#0f0f12', cape: 'mino', headgear: 'kasa', pants: 'baggy', pantsColor: '#5a2a2a', shoes: 'zori' } },
+  { name: 'Thunder Triangles', note: 'Zenitsu style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'triangles', haoriColor: '#e0b13a', haoriColor2: '#f2efe6', pants: 'baggy', shoes: 'tabi', hairColor: '#f0c030', hairTip: '#ff8c2e', hairFade: 'ends' } },
+  { name: 'Flame Hashira', note: 'Fire hair + fire eyes', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'flames', haoriColor: '#f2efe6', haoriColor2: '#d8452f', pants: 'hakama', shoes: 'boots', hair: 'flame', hairColor: '#f6c838', hairTip: '#d8302a', hairFade: 'sharp', eyes: 'blaze', eyeColor: '#d8302a', brows: 'forked' },
+    weapon: { type: 'katana', guard: 'flame', guardColor: '#c0303a', wrap: '#c0303a', engraving: 'metsu' } },
+  { name: 'Butterfly', note: 'Wing haori + big butterfly', set: { uniform: 'corps', uniformColor: '#24203a', haori: 'butterfly', haoriColor: '#f4f0ea', haoriColor2: '#8ee0c8', pants: 'baggy', pantsColor: '#24203a', wrapColor: '#f4f0ea', shoes: 'boots', accessory: 'bigButterfly', accColor: '#9a6ad6', hair: 'bob', hairColor: '#16121c', hairTip: '#7a4bd1', hairFade: 'ends', eyes: 'gentle', eyeColor: '#8a5ad6', body: 'fem' },
+    weapon: { type: 'needle', guard: 'butterfly', guardColor: '#c0c6cf', wrap: '#9a6ad6' } },
+  { name: 'Flashy', note: 'Sound Hashira style', set: { uniform: 'vest', uniformColor: '#1d2233', haori: 'none', pants: 'baggy', pantsColor: '#2a2e3a', wrapColor: '#8a2a3a', shoes: 'zori', accessory: 'headband', accColor: '#e8f4ff', mark: 'paint', armbands: 'gold', earrings: 'studs', earringColor: '#d9a83a', hair: 'neat', hairColor: '#eceef2', eyes: 'sharp', eyeColor: '#8a2a4a', build: 'strong', height: 'tall' },
+    weapon: { type: 'cleavers', blade: '#8a2a3a', guard: 'square', guardColor: '#d9a83a', wrap: '#2a2a2e' } },
   { name: 'Half & Half', note: 'Giyu style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'split', haoriColor: '#5a1e2a', haoriColor2: '#2f8f5b', pants: 'hakama', shoes: 'tabi' } },
-  { name: 'Mist', note: 'Muichiro style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'none', pants: 'hakama', shoes: 'tabi' } },
-  { name: 'Love', note: 'Mitsuri style', set: { uniform: 'open', uniformColor: '#1d2233', haori: 'plain', haoriColor: '#f2efe6', haoriColor2: '#f2efe6', pants: 'skirt', shoes: 'boots' } },
-  { name: 'Wind', note: 'Sanemi style', set: { uniform: 'open', uniformColor: '#1d2233', haori: 'plain', haoriColor: '#f2efe6', haoriColor2: '#f2efe6', pants: 'hakama', shoes: 'tabi' } },
-  { name: 'Hemp Kimono', note: 'Nezuko style', set: { uniform: 'kimono', uniformColor: '#e05a8a', haori: 'plain', haoriColor: '#5a1e2a', haoriColor2: '#5a1e2a', pants: 'hakama', shoes: 'zori' } },
-  { name: 'Flower', note: 'Kanao style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'plain', haoriColor: '#f2efe6', haoriColor2: '#f2efe6', pants: 'skirt', shoes: 'boots' } },
-  { name: 'Sound', note: 'Tengen style', set: { uniform: 'vest', uniformColor: '#1d2233', haori: 'none', pants: 'hakama', shoes: 'boots' } },
-  { name: 'Boar Pelt', note: 'Inosuke style', set: { uniform: 'bare', haori: 'none', pants: 'hakama', uniformColor: '#2a2f45', shoes: 'tabi' } },
+  { name: 'Fox Mask', note: 'Scarred mask + hexagons', set: { uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'hexagon', haoriColor: '#d8c040', haoriColor2: '#3a7a3a', accessory: 'scarMask', hair: 'wild', hairColor: '#e8846a', scar: 'cheek' } },
+  { name: 'Flower Kimono', note: 'Blossoms + cat mask', set: { uniform: 'kimono', uniformColor: '#2a2440', haori: 'blossoms', haoriColor: '#e8506a', haoriColor2: '#ffd0dc', pants: 'skirt', shoes: 'zori', accessory: 'flowerMask', hair: 'long', hairColor: '#16121c', body: 'fem' } },
+  { name: 'Mist', note: 'Muichiro style', set: { uniform: 'corps', uniformColor: '#1d2233', haori: 'none', pants: 'hakama', shoes: 'tabi', hair: 'long', hairColor: '#1b1416', hairTip: '#8ad6b0', hairFade: 'full' } },
+  { name: 'Love', note: 'Mitsuri style', set: { uniform: 'open', uniformColor: '#1d2233', haori: 'plain', haoriColor: '#f2efe6', haoriColor2: '#f2efe6', pants: 'skirt', shoes: 'boots', hair: 'braids', hairColor: '#ff7aa8', hairTip: '#8ad6b0', hairFade: 'sharp', body: 'fem' } },
+  { name: 'Boar Pelt', note: 'Inosuke style', set: { species: 'boar', uniform: 'bare', haori: 'none', pants: 'baggy', pantsColor: '#26304a', shoes: 'furBoots', furColor: '#9a948e' },
+    weapon: { type: 'jagged', blade: '#7a8aa0', guard: 'none', wrap: '#e8e4ec' } },
+  { name: 'Swordsmith', note: 'Hyottoko mask', set: { species: 'smith', uniform: 'kimono', uniformColor: '#2a2a2e', haori: 'none', pants: 'hakama', pantsColor: '#b8ac90', shoes: 'geta', hairColor: '#1b1416' },
+    weapon: { type: 'dual', blade: '#c0c6cf', guard: 'none', wrap: '#5a3a24' } },
+  { name: 'Muscle Mouse', note: 'Flex!', set: { species: 'mouse', accColor: '#d8a6e8', furColor: '#c9c4d6', shortsColor: '#3a2a4a' } },
+  { name: 'Hemp Kimono', note: 'Nezuko style', set: { uniform: 'kimono', uniformColor: '#e05a8a', haori: 'plain', haoriColor: '#5a1e2a', haoriColor2: '#5a1e2a', pants: 'skirt', shoes: 'zori', accessory: 'ribbon', accColor: '#e05a8a', hair: 'long', hairColor: '#1b1416', hairTip: '#ff8c2e', hairFade: 'ends', body: 'fem' } },
   { name: 'Mountain Trainee', note: 'Training gear', set: { uniform: 'training', uniformColor: '#f2efe6', haori: 'none', pants: 'hakama', shoes: 'zori' } },
 ];
 
 export const DEFAULT_LOOK = {
-  species: 'human', body: 'masc', furColor: '#bdb6c4',
+  species: 'human', body: 'masc', furColor: '#c9c4d6', shortsColor: '#3a2a4a', hairFade: 'soft',
+  scarf: 'none', scarfColor: '#4a7ad8', headgear: 'none', headgearColor: '#c0303a', cape: 'none', armbands: 'none', wrapColor: '#f2efe6', pantsColor: '',
   skin: '#f9d4b8', face: 'oval', eyes: 'round', eyeColor: '#b3262e', eyeColor2: '', brows: 'soft', nose: 'line',
   mouth: 'smile', ears: 'normal', earrings: 'none', earringColor: '#d9a83a', scar: 'none', mark: 'none', blush: true,
   hair: 'spiky', hairColor: '#3a2622', hairTip: '', accessory: 'none', accColor: '#e05a8a',

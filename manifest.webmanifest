@@ -1,7 +1,7 @@
 {
-  "name": "Slayer's Path",
-  "short_name": "Slayer's Path",
-  "description": "Create your own demon slayer, train, slay demons and rise to Hashira.",
+  "name": "Onigari: Blade of Dawn",
+  "short_name": "Onigari",
+  "description": "Onigari (鬼狩り, oh-nee-GAH-ree) means Demon Hunter. Create your hunter, train, slay demons and rise to Hashira.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

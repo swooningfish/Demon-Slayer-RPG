@@ -9,7 +9,18 @@ import { forms, rankProgress, fullHeal, trainingLeft, activeWeapon, weaponOf, ra
 const MENTOR_LOOK = { ...DEFAULT_LOOK, hair: 'neat', hairColor: '#e8e8ee', eyes: 'sleepy', eyeColor: '#3c8be0', mouth: 'neutral', brows: 'thick',
   accessory: 'foxMask', accColor: '#c0303a', haori: 'waves', haoriColor: '#2a4f86', haoriColor2: '#f2efe6', uniform: 'kimono', uniformColor: '#3a2f4f', skin: '#f0c29e', blush: false };
 const mentorFace = () => renderAvatar(MENTOR_LOOK, { headOnly: true });
-const crowFace = () => `<svg viewBox="0 0 60 60" aria-hidden="true"><ellipse cx="30" cy="36" rx="18" ry="16" fill="#16121c"/><circle cx="30" cy="20" r="12" fill="#16121c"/><path d="M40,18 L54,22 L40,25Z" fill="#d9a83a"/><circle cx="34" cy="17" r="2.6" fill="#fff"/><circle cx="34.6" cy="17" r="1.3" fill="#16121c"/><path d="M14,34 Q4,44 12,52 Q18,44 22,40Z" fill="#2a2433"/></svg>`;
+// Kasugai crow: a sleek blue-black jungle crow with a heavy beak and a pale eye.
+const crowFace = () => `<svg viewBox="0 0 64 64" aria-hidden="true"><g stroke="#0c0e18" stroke-width="1.6" stroke-linejoin="round">
+  <path d="M6,44 L20,36 L24,46 L10,50Z" fill="#181b2c"/>
+  <path d="M14,40 Q18,24 36,22 Q48,24 48,36 Q44,50 26,50 Q16,48 14,40Z" fill="#1e2236"/>
+  <path d="M20,36 Q32,28 44,36 Q36,46 18,46Z" fill="#283050"/>
+  <circle cx="42" cy="20" r="10" fill="#1e2236"/>
+  <path d="M48,14 Q60,13 63,21 Q56,21 50,24Z" fill="#2c3048"/></g>
+  <path d="M50,16 Q58,15 61,19" stroke="#6a7498" stroke-width="1.2" fill="none"/>
+  <path d="M24,38 Q32,33 40,38 M22,42 Q30,38 38,42" stroke="#4a5a8a" stroke-width="1" fill="none"/>
+  <path d="M34,14 Q40,10 46,12 M26,28 Q34,24 42,26" stroke="#5a6c9e" stroke-width="1.4" fill="none" opacity=".8"/>
+  <circle cx="45" cy="18" r="2.4" fill="#cdd0de"/><circle cx="45.4" cy="18" r="1" fill="#14161f"/>
+  <path d="M28,50 L27,58 M34,50 L35,58 M24,58 L30,58 M32,58 L38,58" stroke="#14161f" stroke-width="1.6"/></svg>`;
 const meFace = () => renderAvatar(app.game.look, { headOnly: true });
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
@@ -39,7 +50,7 @@ function objective(g) {
 /* ---------------- intro ---------------- */
 export async function introScreen(root) {
   const g = app.game;
-  root.innerHTML = `<div class="scene scene-forest night"><div class="backdrop">${renderScene('forest', 1)}</div><div class="scene-avatar">${renderAvatar(g.look, { name: g.name })}</div></div>`;
+  root.innerHTML = `<div class="scene scene-forest night"><div class="backdrop">${renderScene('cabin', 1)}</div><div class="scene-avatar">${renderAvatar(g.look, { name: g.name })}</div></div>`;
   await dialog([
     { who: 'Story', text: `Deep in a snowy mountain forest, ${g.name} lives in a little cabin with their family.` },
     { who: 'Story', text: 'One night, a demon creeps out of the trees. Before it can reach the village, a demon slayer in a swirling haori cuts it down in a flash of light.' },
@@ -96,7 +107,7 @@ export function mapScreen(root) {
 export function homeScreen(root) {
   const g = app.game;
   root.innerHTML = `${hud(g)}
-    <div class="scene scene-home"><div class="backdrop">${renderScene('hut', 2)}</div><div class="scene-avatar">${renderAvatar(g.look, { name: g.name, weapon: g.weapon, breathing: g.breathing, trainee: g.rank === 0 })}</div></div>
+    <div class="scene scene-home"><div class="backdrop">${renderScene('interior', 2)}</div><div class="scene-avatar">${renderAvatar(g.look, { name: g.name, weapon: g.weapon, breathing: g.breathing, trainee: g.rank === 0 })}</div></div>
     <div class="menu-list">
       <button class="btn big" data-act="rest">🛌 Rest <small>Restore health and refill wisteria tea</small></button>
       <button class="btn big" data-act="wardrobe">👘 Wardrobe <small>Change your face, hair and outfit</small></button>
@@ -213,7 +224,8 @@ async function startSelection() {
 
 /* ---------------- patrol ---------------- */
 const PLACES = [['by the frozen river', 'river'], ['in the bamboo grove', 'bamboo'], ['at the abandoned mill', 'mill'], ['on the mountain path', 'path'],
-  ['near the old well', 'well'], ['in the misty valley', 'valley'], ['at the charcoal hut', 'hut'], ['beneath the giant cedar', 'cedar'], ['deep in the forest', 'forest']];
+  ['near the old well', 'well'], ['in the misty valley', 'valley'], ['at the charcoal hut', 'hut'], ['beneath the giant cedar', 'cedar'], ['deep in the forest', 'forest'],
+  ['at the forest temple', 'temple'], ['by the charcoal kiln', 'cabin'], ['on the road into town', 'street']];
 
 function ensureMissions(g) {
   if (g.missions?.length === 3 && g.missions[0].rank === g.rank) return;
