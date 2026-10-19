@@ -9,6 +9,7 @@ import { battleScreen } from './battle.js';
 import { trainScreen } from './minigames.js';
 import { labScreen, labEditScreen } from './lab.js';
 
+export const APP_VERSION = self.APP_VERSION || 'dev';
 let installEvent = null;
 const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -19,7 +20,7 @@ function titleScreen(root) {
   root.innerHTML = `
     <div class="title-screen">
       <div class="logo"><span class="logo-kanji" aria-hidden="true">滅</span><h1>Demon Slayer RPG</h1>
-        <p class="logo-sub">A fan-made adventure</p><p>Create your slayer. Train. Rise to Hashira.</p></div>
+        <p class="logo-sub">A fan-made adventure</p><p class="ver-line">Version ${APP_VERSION}</p><p>Create your slayer. Train. Rise to Hashira.</p></div>
       ${storageOk ? '' : '<p class="warn">Saving is blocked in this browser (private mode?). Progress will be lost when you close the page.</p>'}
       <div class="slots">${slots.map((s, i) => s ? `
         <div class="slot">
@@ -101,7 +102,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  navigator.serviceWorker.register('sw.js').catch(() => { /* offline support unavailable */ });
+  // updateViaCache 'none': always check sw.js and version.js with the server, so updates arrive straight away.
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => { /* offline support unavailable */ });
 }
 
+document.getElementById('ver').textContent = `v${APP_VERSION}`;
 go('title');

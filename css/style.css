@@ -366,3 +366,8 @@ small { color: var(--muted); }
 .logo-say b { color: var(--text); }
 .logo .logo-sub { font-style: italic; color: var(--accent); margin-top: 2px; }
 .topbar-btns { display: flex; gap: 6px; }
+/* Version: shown under the logo and as a faint corner badge on every screen. */
+.logo .ver-line { font-size: .78rem; margin-top: 6px; letter-spacing: .05em; }
+#ver { position: fixed; left: 8px; bottom: calc(4px + var(--safe-b)); z-index: 150; font-size: .66rem; color: var(--muted); opacity: .6; pointer-events: none; }
+#app.screen-battle ~ #ver { display: none; } /* battle shows it beside the scene name */
+#app.screen-title ~ #ver { display: none; }

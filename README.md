@@ -52,7 +52,7 @@ Then open http://localhost:8765.
 
 ### Publishing updates
 
-1. Bump `VERSION` in `sw.js` so installed copies refresh their offline cache.
+1. Bump `APP_VERSION` in [`version.js`](version.js), for example `1.4.0` → `1.5.0`. It's shown on the title screen and in the corner of every screen, and it renames the offline cache so installed copies refresh.
 2. Commit and push to `main`.
 3. GitHub Pages rebuilds automatically, usually within a minute or two (watch it under the repo's **Actions** tab). The live site then serves the new version.
 

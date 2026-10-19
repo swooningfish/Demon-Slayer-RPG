@@ -1,16 +1,19 @@
 // Offline support: cache the app shell. Network first (so updates show straight away), cache when offline.
-// Bump VERSION whenever files change so players get the update.
-const VERSION = 'v4';
+// GitHub Pages lets browsers reuse files for 10 minutes, so every request revalidates with the
+// server ('no-cache') instead of trusting the browser's HTTP cache.
+// The version comes from version.js: change it there for every release.
+importScripts('version.js');
+const VERSION = self.APP_VERSION;
 const CACHE = `demon-slayer-rpg-${VERSION}`;
 const FILES = [
-  './', 'index.html', 'manifest.webmanifest', 'css/style.css',
+  './', 'index.html', 'version.js', 'manifest.webmanifest', 'css/style.css',
   'js/main.js', 'js/ui.js', 'js/store.js', 'js/data.js', 'js/game.js', 'js/avatar.js', 'js/demons.js',
   'js/creator.js', 'js/world.js', 'js/battle.js', 'js/minigames.js', 'js/lab.js', 'js/scenes.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -21,7 +24,9 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
-  e.respondWith(fetch(e.request).then((res) => {
+  // Navigation requests can't be re-created with options, so rebuild them from the URL.
+  const fresh = e.request.mode === 'navigate' ? new Request(e.request.url, { cache: 'no-cache' }) : new Request(e.request, { cache: 'no-cache' });
+  e.respondWith(fetch(fresh).then((res) => {
     if (res.ok) {
       const copy = res.clone();
       caches.open(CACHE).then((c) => c.put(e.request, copy));

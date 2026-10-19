@@ -38,7 +38,7 @@ export function battleScreen(root, params) {
           <div class="player-sprite">${renderAvatar(g.look, { name: g.name, weapon: g.weapon, breathing: g.breathing, trainee: g.rank === 0, pose: 'action' })}</div>
           <div class="enemy-sprite"></div>
         </div>
-        <div class="scene-name">${SCENES[params.scene || 'forest'].name}</div>
+        <div class="scene-name">${SCENES[params.scene || 'forest'].name} · v${self.APP_VERSION || 'dev'}</div>
         <div class="fx-layer" aria-hidden="true"></div>
       </div>
       <div class="log" aria-live="polite"></div>
